@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const connectDB = async (dbUri) => {
   try {
     await mongoose.connect(dbUri);
-    console.log('MongoDB Connected');
+    console.log('Kết nối MongoDB thành công');
     // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.error('Database connection failed');
+    console.error('Kết nối MongoDB thất bại:');
     process.exit(1);
   }
 };

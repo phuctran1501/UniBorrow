@@ -12,7 +12,7 @@ const protect = async (req, res, next) => {
   if (!token) {
     return res.status(401).json({
       success: false,
-      message: 'Not authorized, no token'
+      message: 'Không có quyền truy cập, thiếu token'
     });
   }
 
@@ -25,9 +25,21 @@ const protect = async (req, res, next) => {
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: 'Not authorized, token failed'
+      message: 'Không có quyền truy cập, token không hợp lệ'
     });
   }
 };
 
-module.exports = { protect };
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Không có quyền truy cập'
+      });
+    }
+    next();
+  };
+};
+
+module.exports = { protect, authorize };

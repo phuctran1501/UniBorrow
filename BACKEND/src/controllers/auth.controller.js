@@ -24,12 +24,30 @@ const generateToken = (user) => {
 const register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
+    if (!name)  {
+      return res.status(400).json({
+        success: false,
+        message: 'Tên là bắt buộc'
+      });
+    }
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email là bắt buộc'
+      });
+    }
 
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mật khẩu là bắt buộc'
+      });
+    }
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'Email already exists'
+        message: 'Email đã tồn tại'
       });
     }
 
@@ -43,7 +61,7 @@ const register = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: 'User registered successfully',
+      message: 'Đăng ký thành công',
       token,
       data: {
         id: user._id,
@@ -63,12 +81,24 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email là bắt buộc'
+      });
+    }
 
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mật khẩu là bắt buộc'
+      });
+    }
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: 'User not found'
+        message: 'Người dùng không tồn tại'
       });
     }
 
@@ -76,7 +106,7 @@ const login = async (req, res, next) => {
     if (!isMatch) {
       return res.status(400).json({
         success: false,
-        message: 'Incorrect password'
+        message: 'Mật khẩu không đúng'
       });
     }
 
@@ -84,7 +114,7 @@ const login = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: 'Login successful',
+      message: 'Đăng nhập thành công',
       token,
       data: {
         id: user._id,
