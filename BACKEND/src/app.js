@@ -10,6 +10,9 @@ app.get('/', (req, res) => {
   res.json({ message: 'UniBorrow API is running' });
 });
 
+const authRoutes = require('./routes/auth.routes');
+app.use('/api/auth', authRoutes);
+
 const errorHandler = require('./middleware/errorHandler');
 app.use(errorHandler);
 
