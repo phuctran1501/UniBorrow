@@ -4,9 +4,8 @@ const connectDB = async (dbUri) => {
   try {
     await mongoose.connect(dbUri);
     console.log('Kết nối MongoDB thành công');
-    // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.error('Kết nối MongoDB thất bại:');
+    console.error('Kết nối MongoDB thất bại:', error.message);
     process.exit(1);
   }
 };

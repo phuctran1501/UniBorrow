@@ -1,131 +1,50 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/user.model');
+const authService = require('../services/auth.service');
 
-/**
- * Generate JWT
- */
-const generateToken = (user) => {
-  return jwt.sign(
-    {
-      id: user._id,
-      role: user.role,
-      name: user.name
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.JWT_EXPIRES_IN
-    }
-  );
-};
-
-/**
- * Register
- */
-const register = async (req, res, next) => {
+// docgia
+const registerDocGia = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
-    if (!name)  {
-      return res.status(400).json({
-        success: false,
-        message: 'Tên là bắt buộc'
-      });
-    }
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email là bắt buộc'
-      });
-    }
-
-    if (!password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Mật khẩu là bắt buộc'
-      });
-    }
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email đã tồn tại'
-      });
-    }
-
-    const user = await User.create({
-      name,
-      email,
-      password
-    });
-
-    const token = generateToken(user);
+    const result = await authService.registerDocGia(req.body);
 
     res.status(201).json({
       success: true,
       message: 'Đăng ký thành công',
-      token,
-      data: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }
+      data: result
     });
   } catch (error) {
     next(error);
   }
 };
 
-/**
- * Login
- */
+// admin tao nhanvien
+const createNhanVien = async (req, res, next) => {
+  try {
+    const result = await authService.createNhanVien(req.body);
+
+    res.status(201).json({
+      success: true,
+      message: 'Tạo nhân viên thành công',
+      data: result
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// login
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email là bắt buộc'
-      });
-    }
+    const { username, password } = req.body;
 
-    if (!password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Mật khẩu là bắt buộc'
-      });
-    }
-    const user = await User.findOne({ email }).select('+password');
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'Người dùng không tồn tại'
-      });
-    }
-
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(400).json({
-        success: false,
-        message: 'Mật khẩu không đúng'
-      });
-    }
-
-    const token = generateToken(user);
+    const result = await authService.login(username, password);
 
     res.status(200).json({
       success: true,
       message: 'Đăng nhập thành công',
-      token,
-      data: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }
+      data: result
     });
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = { register, login };
+module.exports = { registerDocGia, createNhanVien, login };

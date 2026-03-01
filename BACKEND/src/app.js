@@ -7,23 +7,18 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.json({ message: 'UniBorrow API đang chạy' });
+  res.json({ message: 'UniBorrow API is running' });
 });
 
 const authRoutes = require('./routes/auth.routes');
+const bookRoutes = require('./routes/sach.routes');
+const borrowRoutes = require('./routes/theodoimuonsach.routes');
+const nhaXuatBanRoutes = require('./routes/nhaxuatban.routes');
+
 app.use('/api/auth', authRoutes);
-
-const createBooksRoutes = require('./routes/book.routes');
-app.use('/api/book', createBooksRoutes);
-
-const getBooksRoutes = require('./routes/book.routes');
-app.use('/api/book', getBooksRoutes);
-
-const borrowRoutes = require('./routes/borrow.routes');
-app.use('/api/borrow', borrowRoutes);
-
-const adminRoutes = require('./routes/admin.routes');
-app.use('/api/admin', adminRoutes);
+app.use('/api/books', bookRoutes);
+app.use('/api/borrows', borrowRoutes);
+app.use('/api/publisher', nhaXuatBanRoutes);
 
 const errorHandler = require('./middleware/errorHandler');
 app.use(errorHandler);

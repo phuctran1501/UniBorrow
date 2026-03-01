@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const { register, login } = require('../controllers/auth.controller');
-const { protect } = require('../middleware/auth.middleware');
 
-router.post('/register', register);
+const { registerDocGia, createNhanVien, login } = require('../controllers/auth.controller');
+const { protect, authorize } = require('../middleware/auth.middleware');
+
+// docgia
+router.post('/register', registerDocGia);
+
+// login
 router.post('/login', login);
-router.get('/profile', protect, (req, res) => {
-  res.json({
-    success: true,
-    data: req.user
-  });
-});
+
+// admin tao nhanvien
+router.post('/create-employee', protect, authorize('admin'), createNhanVien);
 
 module.exports = router;
