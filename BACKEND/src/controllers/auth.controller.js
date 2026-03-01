@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 
 const register = async (req, res, next) => {
@@ -35,4 +36,48 @@ const register = async (req, res, next) => {
   }
 };
 
-module.exports = { register };
+const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    // kiểm tra user tồn tại
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // so sánh password
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: 'Incorrect password'
+      });
+    }
+
+    // tạo token
+    const token = jwt.sign(
+      {
+        id: user._id,
+        role: user.role
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Login successful',
+      token
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { register, login };
