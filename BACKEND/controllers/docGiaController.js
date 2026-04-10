@@ -11,11 +11,6 @@ const registerDocGia = async (req, res) => {
             return res.status(400).json({ message: 'Tài khoản đã tồn tại' });
         }
 
-        // const phoneExists = await DocGia.findOne({ DienThoai });
-        // if (phoneExists) {
-        //     return res.status(400).json({ message: 'Số điện thoại đã được đăng ký' });
-        // }
-
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(Password, salt);
 
@@ -81,8 +76,32 @@ const getMe = async (req, res) => {
     }
 };
 
+const getDocGias = async (req, res) => {
+    try {
+        const docGias = await DocGia.find().select('-Password');
+        res.json(docGias);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+const toggleStatusDocGia = async (req, res) => {
+    try {
+        const docGia = await DocGia.findById(req.params.id);
+        if(!docGia) return res.status(404).json({message: 'Không tìm thấy độc giả'});
+
+        docGia.TrangThai = !docGia.TrangThai;
+        await docGia.save();
+        res.json({ message: `Đã ${docGia.TrangThai ? 'Mở' : 'Khóa'} tài khoản`, TrangThai: docGia.TrangThai });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 module.exports = {
     registerDocGia,
     loginDocGia,
     getMe,
+    getDocGias,
+    toggleStatusDocGia
 };

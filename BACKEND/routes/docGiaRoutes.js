@@ -103,4 +103,41 @@ router.post('/login', loginDocGia);
  */
 router.get('/me', protect, getMe);
 
+const { getDocGias, toggleStatusDocGia } = require('../controllers/docGiaController');
+const { admin } = require('../middlewares/authMiddleware');
+
+/**
+ * @swagger
+ * /api/docgia:
+ *   get:
+ *     summary: Danh sách tất cả Độc Giả (Khối Admin)
+ *     tags: [Độc Giả]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Trả về danh sách Độc giả 
+ */
+router.get('/', protect, admin, getDocGias);
+
+/**
+ * @swagger
+ * /api/docgia/toggle-status/{id}:
+ *   put:
+ *     summary: Khóa / Mở khóa tài khoản Độc giả (Khối Admin)
+ *     tags: [Độc Giả]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Chuyển đổi trạng thái tài khoản thành công
+ */
+router.put('/toggle-status/:id', protect, admin, toggleStatusDocGia);
+
 module.exports = router;
