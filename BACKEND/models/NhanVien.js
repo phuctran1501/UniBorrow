@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const nhanVienSchema = new mongoose.Schema(
     {
+        Username: { type: String, required: true, unique: true },
         HoTenNV: { type: String, required: true },
         Password: { type: String, required: true },
         ChucVu: { type: String, enum: ['Admin', 'Nhân viên'], default: 'Nhân viên' },

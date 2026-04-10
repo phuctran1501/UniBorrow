@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const docGiaSchema = new mongoose.Schema(
     {
+        Username: { type: String, required: true, unique: true },
         HoLot: { type: String, required: true },
         Ten: { type: String, required: true },
         Password: { type: String, required: true },
