@@ -9,11 +9,13 @@ const theoDoiMuonSachSchema = new mongoose.Schema(
         HanTra: { type: Date, default: null }, 
         TrangThai: {
             type: String,
-            enum: ['ChoDuyet', 'DangMuon', 'DaTra', 'QuaHan', 'DaThanhToan'],
+            enum: ['ChoDuyet', 'DangMuon', 'DaTra', 'QuaHan', 'DaThanhToan', 'TuChoi'],
             default: 'ChoDuyet',
         },
     },
-    { timestamps: true }
+    { 
+        timestamps: true 
+    }
 );
 
 module.exports = mongoose.model('TheoDoiMuonSach', theoDoiMuonSachSchema);
