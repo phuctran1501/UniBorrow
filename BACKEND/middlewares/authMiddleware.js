@@ -22,17 +22,17 @@ const protect = async (req, res, next) => {
             }
 
             if (!req.user) {
-                return res.status(401).json({ message: 'Người dùng không tồn tại' });
+                return res.status(401).json({ message: 'Người dùng không tồn tại trên hệ thống' });
             }
 
             req.userRole = decoded.role;
             next();
         } catch (error) {
-            console.error(error);
-            return res.status(401).json({ message: 'Không được phép truy cập, token không hợp lệ' });
+            console.error('Lỗi xác thực JWT:', error);
+            return res.status(401).json({ message: 'Token không hợp lệ hoặc đã hết hạn' });
         }
     } else {
-        return res.status(401).json({ message: 'Không được phép truy cập, không có token' });
+        return res.status(401).json({ message: 'Vui lòng đăng nhập để truy cập tính năng này' });
     }
 };
 
@@ -40,7 +40,7 @@ const admin = (req, res, next) => {
     if (req.user && req.userRole === 'NhanVien' && req.user.ChucVu === 'Admin') {
         next();
     } else {
-        return res.status(403).json({ message: 'Không được phép truy cập, chỉ dành cho Admin' });
+        return res.status(403).json({ message: 'Bạn không có quyền quản trị (Admin) để thực hiện' });
     }
 };
 
@@ -48,7 +48,7 @@ const nhanVienOnly = (req, res, next) => {
     if (req.user && req.userRole === 'NhanVien') {
         next();
     } else {
-        return res.status(403).json({ message: 'Không được phép truy cập, chỉ dành cho Nhân viên' });
+        return res.status(403).json({ message: 'Quyền truy cập dành riêng cho nhân viên thư viện' });
     }
 };
 
