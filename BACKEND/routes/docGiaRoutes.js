@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { registerDocGia, loginDocGia, getMe } = require('../controllers/docGiaController');
+const { registerDocGia, loginDocGia, getMe, socialLoginDocGia } = require('../controllers/docGiaController');
+const { checkOverdueBorrows } = require('../utils/cronJobs');
 const { protect } = require('../middlewares/authMiddleware');
 
 /**
@@ -24,14 +25,14 @@ const { protect } = require('../middlewares/authMiddleware');
  *           schema:
  *             type: object
  *             required:
- *               - Username
+ *               - Email
  *               - HoLot
  *               - Ten
  *               - Password
  *               - DiaChi
  *               - DienThoai
  *             properties:
- *               Username:
+ *               Email:
  *                 type: string
  *               HoLot:
  *                 type: string
@@ -54,7 +55,7 @@ const { protect } = require('../middlewares/authMiddleware');
  *       201:
  *         description: Đăng ký thành công
  *       400:
- *         description: Dữ liệu không hợp lệ hoặc Tên tài khoản/SĐT đã tồn tại
+ *         description: Dữ liệu không hợp lệ hoặc Email/SĐT đã tồn tại
  */
 router.post('/register', registerDocGia);
 
@@ -72,10 +73,10 @@ router.post('/register', registerDocGia);
  *           schema:
  *             type: object
  *             required:
- *               - Username
+ *               - Email
  *               - Password
  *             properties:
- *               Username:
+ *               Email:
  *                 type: string
  *               Password:
  *                 type: string
@@ -88,6 +89,8 @@ router.post('/register', registerDocGia);
  *         description: Tài khoản bị khóa
  */
 router.post('/login', loginDocGia);
+
+router.post('/social-login', socialLoginDocGia);
 
 /**
  * @swagger
@@ -139,5 +142,14 @@ router.get('/', protect, admin, getDocGias);
  *         description: Chuyển đổi trạng thái tài khoản thành công
  */
 router.put('/toggle-status/:id', protect, admin, toggleStatusDocGia);
+
+router.post('/test-overdue-check', protect, admin, async (req, res) => {
+    try {
+        await checkOverdueBorrows();
+        res.json({ message: 'Đã hoàn thành quét quá hạn.' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
 module.exports = router;

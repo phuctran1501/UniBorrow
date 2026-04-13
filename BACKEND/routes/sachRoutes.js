@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getBooks, registerMuonSach, cancelMuonSach } = require('../controllers/sachController');
+const { getBooks, registerMuonSach, cancelMuonSach, getMyBorrows, getRecentBooks } = require('../controllers/sachController');
 const { protect } = require('../middlewares/authMiddleware');
 
 /**
@@ -27,6 +27,8 @@ const { protect } = require('../middlewares/authMiddleware');
  *         description: Danh sách các sách
  */
 router.route('/').get(getBooks);
+
+router.route('/recent').get(getRecentBooks);
 
 /**
  * @swagger
@@ -80,7 +82,9 @@ router.route('/borrow/:id').post(protect, registerMuonSach);
  */
 router.route('/cancel/:idBorrow').delete(protect, cancelMuonSach);
 
-const { createBook, updateBook, deleteBook, approveBorrow, returnBook, payFine } = require('../controllers/sachController');
+router.route('/my-borrows').get(protect, getMyBorrows);
+
+const { createBook, updateBook, deleteBook, approveBorrow, rejectBorrow, returnBook, payFine, getAllBorrows } = require('../controllers/sachController');
 const { nhanVienOnly } = require('../middlewares/authMiddleware');
 
 /**
@@ -97,11 +101,23 @@ const { nhanVienOnly } = require('../middlewares/authMiddleware');
  *         application/json:
  *           schema:
  *             type: object
+ *             properties:
+ *               TenSach: { type: string }
+ *               DonGia: { type: number }
+ *               SoQuyen: { type: number }
+ *               NamXuatBan: { type: number }
+ *               MaNXB: { type: string }
+ *               TacGia: { type: string }
+ *               TheLoai: { type: string }
+ *               HinhAnh: { type: string }
+ *               MoTa: { type: string }
  *     responses:
  *       201:
  *         description: Thành công
  */
 router.route('/').post(protect, nhanVienOnly, createBook);
+
+router.route('/all-borrows').get(protect, nhanVienOnly, getAllBorrows);
 
 /**
  * @swagger
@@ -123,6 +139,16 @@ router.route('/').post(protect, nhanVienOnly, createBook);
  *         application/json:
  *           schema:
  *             type: object
+ *             properties:
+ *               TenSach: { type: string }
+ *               DonGia: { type: number }
+ *               SoQuyen: { type: number }
+ *               NamXuatBan: { type: number }
+ *               MaNXB: { type: string }
+ *               TacGia: { type: string }
+ *               TheLoai: { type: string }
+ *               HinhAnh: { type: string }
+ *               MoTa: { type: string }
  *     responses:
  *       200:
  *         description: Thành công
@@ -163,6 +189,26 @@ router.route('/:id').put(protect, nhanVienOnly, updateBook).delete(protect, nhan
  *         description: Duyệt thành công
  */
 router.route('/approve/:idBorrow').put(protect, nhanVienOnly, approveBorrow);
+
+/**
+ * @swagger
+ * /api/sach/reject/{idBorrow}:
+ *   put:
+ *     summary: Từ chối yêu cầu mượn sách (Nhân viên)
+ *     tags: [Quản Lý Sách & Mượn TRả - Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: idBorrow
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Từ chối thành công
+ */
+router.route('/reject/:idBorrow').put(protect, nhanVienOnly, rejectBorrow);
 
 /**
  * @swagger

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { seedAdmin, createNhanVien, getNhanViens, deleteNhanVien, loginNhanVien } = require('../controllers/nhanVienController');
+const { createNhanVien, getNhanViens, deleteNhanVien, loginNhanVien, getDashboardStats } = require('../controllers/nhanVienController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
 /**
@@ -23,10 +23,10 @@ const { protect, admin } = require('../middlewares/authMiddleware');
  *           schema:
  *             type: object
  *             required:
- *               - Username
+ *               - Email
  *               - Password
  *             properties:
- *               Username:
+ *               Email:
  *                 type: string
  *               Password:
  *                 type: string
@@ -37,6 +37,21 @@ const { protect, admin } = require('../middlewares/authMiddleware');
  *         description: Sai thông tin
  */
 router.post('/login', loginNhanVien);
+
+/**
+ * @swagger
+ * /api/nhanvien/dashboard-stats:
+ *   get:
+ *     summary: Lấy thống kê cho Dashboard (Admin)
+ *     tags: [Nhân Viên]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Trả về số liệu thống kê
+ */
+// Thống kê dashboard (Yêu cầu quyền Admin)
+router.get('/dashboard-stats', protect, admin, getDashboardStats);
 
 /**
  * @swagger
@@ -61,7 +76,7 @@ router.post('/login', loginNhanVien);
  *           schema:
  *             type: object
  *             properties:
- *               Username:
+ *               Email:
  *                 type: string
  *               HoTenNV:
  *                 type: string
