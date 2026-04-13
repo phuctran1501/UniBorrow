@@ -13,7 +13,7 @@ const createNhaXuatBan = async (req, res) => {
     const { TenNXB, DiaChi } = req.body;
     try {
         const exists = await NhaXuatBan.findOne({ TenNXB });
-        if (exists) return res.status(400).json({ message: 'Nhà xuất bản đã tồn tại' });
+        if (exists) return res.status(400).json({ message: 'Nhà xuất bản này đã tồn tại trong hệ thống' });
         
         const nxb = await NhaXuatBan.create({ TenNXB, DiaChi });
         res.status(201).json(nxb);
@@ -25,7 +25,7 @@ const createNhaXuatBan = async (req, res) => {
 const updateNhaXuatBan = async (req, res) => {
     try {
         const nxb = await NhaXuatBan.findById(req.params.id);
-        if (!nxb) return res.status(404).json({ message: 'Không tìm thấy' });
+        if (!nxb) return res.status(404).json({ message: 'Không tìm thấy nhà xuất bản' });
 
         nxb.TenNXB = req.body.TenNXB || nxb.TenNXB;
         nxb.DiaChi = req.body.DiaChi || nxb.DiaChi;
@@ -40,7 +40,7 @@ const updateNhaXuatBan = async (req, res) => {
 const deleteNhaXuatBan = async (req, res) => {
     try {
         const nxb = await NhaXuatBan.findById(req.params.id);
-        if (!nxb) return res.status(404).json({ message: 'Không tìm thấy' });
+        if (!nxb) return res.status(404).json({ message: 'Không tìm thấy nhà xuất bản' });
 
         await nxb.deleteOne();
         res.json({ message: 'Xóa nhà xuất bản thành công' });

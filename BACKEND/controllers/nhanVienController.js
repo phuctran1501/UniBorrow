@@ -1,18 +1,20 @@
 const NhanVien = require('../models/NhanVien');
+const Sach = require('../models/Sach');
+const TheoDoiMuonSach = require('../models/TheoDoiMuonSach');
 const generateToken = require('../utils/generateToken');
 const bcrypt = require('bcryptjs');
 
 const createNhanVien = async (req, res) => {
-    const { Username, HoTenNV, Password, ChucVu, DiaChi, SoDienThoai } = req.body;
+    const { Email, HoTenNV, Password, ChucVu, DiaChi, SoDienThoai } = req.body;
     try {
-        const userExists = await NhanVien.findOne({ Username });
-        if (userExists) return res.status(400).json({ message: 'Tài khoản đã tồn tại' });
+        const userExists = await NhanVien.findOne({ Email });
+        if (userExists) return res.status(400).json({ message: 'Tài khoản nhân viên này đã tồn tại' });
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(Password, salt);
 
         const nhanVien = await NhanVien.create({
-            Username,
+            Email,
             HoTenNV,
             Password: hashedPassword,
             ChucVu,
@@ -25,42 +27,40 @@ const createNhanVien = async (req, res) => {
     }
 };
 
-const getNhanViens = async (req, res) => {
-    try {
-        const nhanViens = await NhanVien.find().select('-Password');
-        res.json(nhanViens);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-const deleteNhanVien = async (req, res) => {
-    try {
-        const nhanVien = await NhanVien.findById(req.params.id);
-        if (!nhanVien) return res.status(404).json({ message: 'Không tìm thấy' });
-        
-        await nhanVien.deleteOne();
-        res.json({ message: 'Đã xóa nhân viên' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
 
 const loginNhanVien = async (req, res) => {
-    const { Username, Password } = req.body;
+    const { Email, Password } = req.body;
     try {
-        const nhanVien = await NhanVien.findOne({ Username });
+        const nhanVien = await NhanVien.findOne({ Email });
         if (nhanVien && (await bcrypt.compare(Password, nhanVien.Password))) {
             res.json({
                 _id: nhanVien._id,
-                Username: nhanVien.Username,
+                Email: nhanVien.Email,
                 HoTenNV: nhanVien.HoTenNV,
                 ChucVu: nhanVien.ChucVu,
                 token: generateToken(nhanVien._id, 'NhanVien'),
             });
         } else {
-            res.status(401).json({ message: 'Tài khoản hoặc mật khẩu không đúng' });
+            res.status(401).json({ message: 'Email hoặc mật khẩu nhân viên không chính xác' });
         }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const getDashboardStats = async (req, res) => {
+    try {
+        const totalBooks = await Sach.countDocuments(); 
+        const pendingCount = await TheoDoiMuonSach.countDocuments({ TrangThai: 'ChoDuyet' });
+        const borrowingCount = await TheoDoiMuonSach.countDocuments({ TrangThai: 'DangMuon' });
+        const overdueCount = await TheoDoiMuonSach.countDocuments({ TrangThai: 'QuaHan' });
+
+        res.json({
+            totalBooks,
+            pendingCount,
+            borrowingCount,
+            overdueCount
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -68,7 +68,9 @@ const loginNhanVien = async (req, res) => {
 
 module.exports = {
     createNhanVien,
-    getNhanViens,
-    deleteNhanVien,
-    loginNhanVien
+    getNhanViens: async (req, res) => { 
+     const n = await NhanVien.find().select('-Password'); res.json(n); },
+    deleteNhanVien: async (req, res) => { await NhanVien.findByIdAndDelete(req.params.id); res.json({ message: 'Xóa thành công' }); },
+    loginNhanVien,
+    getDashboardStats
 };
