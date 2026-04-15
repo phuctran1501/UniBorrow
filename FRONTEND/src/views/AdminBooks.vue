@@ -6,6 +6,27 @@
         <i class="bi bi-plus-lg me-2"></i> Thêm sách mới
       </button>
     </div>
+    
+    <div class="row mb-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="search-box position-relative">
+          <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+          <input 
+            type="text" 
+            class="form-control rounded-pill ps-5 py-2 border shadow-sm" 
+            placeholder="Tìm kiếm tên sách, tác giả..."
+            v-model="searchQuery"
+          >
+          <button 
+            v-if="searchQuery" 
+            class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 text-muted p-0 border-0 shadow-none"
+            @click="searchQuery = ''"
+          >
+            <i class="bi bi-x-circle-fill"></i>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Book Table -->
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
@@ -57,10 +78,9 @@
       </div>
     </div>
 
-    <!-- Phân trang cho Admin -->
     <div v-if="bookStore.totalPages > 1" class="d-flex justify-content-center align-items-center mb-5 gap-3">
       <button 
-        class="btn btn-outline-primary rounded-pill px-4 fw-bold shadow-sm"
+        class="btn btn-outline-dark rounded-pill px-4 fw-bold shadow-sm"
         :disabled="bookStore.currentPage === 1"
         @click="goToPage(bookStore.currentPage - 1)"
       >
@@ -70,7 +90,7 @@
       <span class="fw-bold">Trang {{ bookStore.currentPage }} / {{ bookStore.totalPages }}</span>
       
       <button 
-        class="btn btn-outline-primary rounded-pill px-4 fw-bold shadow-sm"
+        class="btn btn-outline-dark rounded-pill px-4 fw-bold shadow-sm"
         :disabled="bookStore.currentPage === bookStore.totalPages"
         @click="goToPage(bookStore.currentPage + 1)"
       >
@@ -81,77 +101,91 @@
     <Teleport to="body">
       <div v-if="showModal" class="modal-backdrop fade show" style="z-index: 1060;"></div>
       <div v-if="showModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1070;">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 950px;">
           <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 p-4 pb-0">
-              <h5 class="modal-title fw-bold text-primary">{{ isEditing ? 'Cập nhật sách' : 'Thêm sách mới' }}</h5>
-              <button type="button" class="btn-close shadow-none" @click="showModal = false"></button>
+            <div class="modal-header border-0 p-3 pb-0">
+              <h6 class="modal-title fw-bold text-primary">{{ isEditing ? 'Cập nhật sách' : 'Thêm sách mới' }}</h6>
+              <button type="button" class="btn-close shadow-none small" @click="showModal = false" style="font-size: 0.75rem;"></button>
             </div>
-            <div class="modal-body p-4">
+            <div class="modal-body p-3">
               <form @submit.prevent="handleSubmit">
-                <div class="mb-3">
-                  <label class="form-label fw-medium">Tên sách</label>
-                  <input type="text" class="form-control rounded-3 border-2" v-model="form.TenSach" required>
-                </div>
-                 <div class="row g-3 mb-3">
-                   <div class="col-md-6">
-                     <label class="form-label fw-medium">Tác giả</label>
-                     <input type="text" class="form-control rounded-3 border-2" v-model="form.TacGia" placeholder="Chưa xác định">
-                   </div>
-                   <div class="col-md-6">
-                     <label class="form-label fw-medium">Thể loại</label>
-                     <select class="form-select rounded-3 border-2" v-model="form.TheLoai">
-                       <option value="Chưa xác định">Chọn thể loại</option>
-                       <option v-for="genre in genres" :key="genre" :value="genre">{{ genre }}</option>
-                     </select>
-                   </div>
-                 </div>
-                 <div class="row g-3 mb-3">
-                   <div class="col-md-4">
-                     <label class="form-label fw-medium">Năm xuất bản</label>
-                     <input type="number" class="form-control rounded-3 border-2" v-model="form.NamXuatBan">
-                   </div>
-                   <div class="col-md-4">
-                     <label class="form-label fw-medium">Số quyển</label>
-                     <input type="number" class="form-control rounded-3 border-2" v-model="form.SoQuyen" required>
-                   </div>
-                   <div class="col-md-4">
-                     <label class="form-label fw-medium">Đơn giá (VNĐ)</label>
-                     <input type="number" class="form-control rounded-3 border-2" v-model="form.DonGia" required min="0" step="1000">
-                   </div>
-                 </div>
-                 <div class="mb-3">
-                   <label class="form-label fw-medium">Nhà xuất bản</label>
-                   <select class="form-select rounded-3 border-2" v-model="form.MaNXB">
-                     <option value="">Chưa xác định</option>
-                     <option v-for="nxb in adminStore.publishers" :key="nxb._id" :value="nxb._id">
-                       {{ nxb.TenNXB }}
-                     </option>
-                   </select>
-                 </div>
-                <div class="mb-4">
-                  <label class="form-label fw-medium">Hình ảnh sách</label>
-                  <div class="upload-area rounded-4 border-2 border-dashed p-4 text-center cursor-pointer mb-2" @click="$refs.fileInput.click()">
-                    <div v-if="!form.HinhAnh">
-                      <i class="bi bi-cloud-arrow-up fs-1 text-primary mb-2"></i>
-                      <p class="small text-muted mb-0">Nhấn để tải ảnh lên từ máy tính</p>
+                <div class="row g-4 align-items-stretch">
+                  <div class="col-lg-7 d-flex flex-column">
+                    <div class="mb-4">
+                      <label class="form-label fw-bold mb-2 text-dark">Tên sách</label>
+                      <input type="text" class="form-control rounded-3 border-2 py-2 shadow-sm" v-model="form.TenSach" required style="font-size: 1.1rem;">
                     </div>
-                    <div v-else class="preview-wrapper position-relative">
-                      <img :src="form.HinhAnh" class="img-fluid rounded-3 shadow-sm mb-2" style="max-height: 150px;">
-                      <button type="button" class="btn btn-sm btn-danger rounded-circle position-absolute top-0 end-0 m-1" @click.stop="form.HinhAnh = ''">
-                        <i class="bi bi-x"></i>
+                    
+                    <div class="row g-3 mb-4">
+                       <div class="col-md-6">
+                         <label class="form-label fw-bold mb-2 text-dark">Tác giả</label>
+                         <input type="text" class="form-control rounded-3 border-2 py-2 shadow-sm" v-model="form.TacGia" placeholder="Chưa xác định" style="font-size: 1rem;">
+                       </div>
+                       <div class="col-md-6">
+                         <label class="form-label fw-bold mb-2 text-dark">Thể loại</label>
+                         <select class="form-select rounded-3 border-2 py-2 shadow-sm" v-model="form.TheLoai" style="font-size: 1rem;">
+                           <option value="Chưa xác định">Chọn thể loại</option>
+                           <option v-for="genre in genres" :key="genre" :value="genre">{{ genre }}</option>
+                         </select>
+                       </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                      <div class="col-md-4">
+                        <label class="form-label fw-bold mb-2 text-dark">Năm xuất bản</label>
+                        <input type="number" class="form-control rounded-3 border-2 py-2 shadow-sm" v-model="form.NamXuatBan" style="font-size: 1rem;">
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label fw-bold mb-2 text-dark">Số quyển</label>
+                        <input type="number" class="form-control rounded-3 border-2 py-2 shadow-sm" v-model="form.SoQuyen" required style="font-size: 1rem;">
+                      </div>
+                      <div class="col-md-4">
+                        <label class="form-label fw-bold mb-2 text-dark">Đơn giá (VNĐ)</label>
+                        <input type="number" class="form-control rounded-3 border-2 py-2 shadow-sm" v-model="form.DonGia" required min="0" step="1000" style="font-size: 1rem;">
+                      </div>
+                    </div>
+
+                    <div class="mb-4">
+                      <label class="form-label fw-bold mb-2 text-dark">Nhà xuất bản</label>
+                      <select class="form-select rounded-3 border-2 py-2 shadow-sm" v-model="form.MaNXB" style="font-size: 1rem;">
+                        <option value="">Chưa xác định</option>
+                        <option v-for="nxb in adminStore.publishers" :key="nxb._id" :value="nxb._id">
+                          {{ nxb.TenNXB }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <div class="mt-auto pt-3">
+                      <button class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm" type="submit" :disabled="loading">
+                        {{ loading ? 'Đang lưu...' : (isEditing ? 'Lưu thay đổi' : 'THÊM SÁCH MỚI') }}
                       </button>
                     </div>
                   </div>
-                  <input type="file" ref="fileInput" class="d-none" accept="image/*" @change="handleFileUpload">
+
+                  <div class="col-lg-5">
+                    <div class="mb-4">
+                      <label class="form-label fw-bold mb-2 text-dark">Hình ảnh sách</label>
+                      <div class="upload-area rounded-4 border-2 border-dashed p-3 text-center cursor-pointer mb-2 bg-light d-flex align-items-center justify-content-center" style="min-height: 140px;" @click="$refs.fileInput.click()">
+                        <div v-if="!form.HinhAnh">
+                          <i class="bi bi-cloud-arrow-up fs-1 text-primary opacity-50"></i>
+                          <p class="small text-muted mb-0 mt-2">Nhấn để tải ảnh</p>
+                        </div>
+                        <div v-else class="preview-wrapper position-relative d-inline-block">
+                          <img :src="form.HinhAnh" class="img-fluid rounded-3 shadow-lg" style="max-height: 120px;">
+                          <button type="button" class="btn btn-danger rounded-circle position-absolute top-0 end-0 m-2 p-0 d-flex align-items-center justify-content-center shadow" style="width: 28px; height: 28px;" @click.stop="form.HinhAnh = ''">
+                            <i class="bi bi-x fs-5"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <input type="file" ref="fileInput" class="d-none" accept="image/*" @change="handleFileUpload">
+                    </div>
+
+                    <div class="mb-0">
+                      <label class="form-label fw-bold mb-2 text-dark">Mô tả sách</label>
+                      <textarea class="form-control rounded-3 border-2 py-2 shadow-sm" v-model="form.MoTa" rows="7" placeholder="Nhập mô tả về sách..." style="font-size: 1rem;"></textarea>
+                    </div>
+                  </div>
                 </div>
-                <div class="mb-4">
-                  <label class="form-label fw-medium">Mô tả sách</label>
-                  <textarea class="form-control rounded-3 border-2" v-model="form.MoTa" rows="3" placeholder="Nhập mô tả ngắn về sách..."></textarea>
-                </div>
-                <button class="btn btn-primary w-100 rounded-3 py-2 fw-bold shadow-sm" type="submit" :disabled="loading">
-                  {{ loading ? 'Đang lưu...' : (isEditing ? 'Lưu thay đổi' : 'Thêm sách') }}
-                </button>
               </form>
             </div>
           </div>
@@ -164,7 +198,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import { useBookStore } from '../store/bookStore';
 import { useAdminStore } from '../store/adminStore';
 import { useNotificationStore } from '../store/notificationStore';
@@ -178,6 +212,15 @@ const showModal = ref(false);
 const isEditing = ref(false);     
 const loading = ref(false);       
 const currentId = ref(null);      
+const searchQuery = ref('');
+let searchTimeout = null;
+
+watch(searchQuery, (newVal) => {
+  if (searchTimeout) clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    bookStore.fetchBooks(newVal, false, [], [], 1);
+  }, 500);
+});
 
 const genres = [
   'Công nghệ', 
@@ -213,7 +256,7 @@ const resetForm = () => {
 };
 
 const goToPage = (page) => {
-  bookStore.fetchBooks('', false, [], [], page);
+  bookStore.fetchBooks(searchQuery.value, false, [], [], page);
 };
 
 const editBook = (book) => {
@@ -259,7 +302,7 @@ const handleSubmit = async () => {
   if (result.success) {
     notifStore.add(isEditing.value ? 'Đã cập nhật sách thành công' : 'Đã thêm sách mới thành công');
     showModal.value = false;
-    bookStore.fetchBooks(); // Tải lại danh sách sách
+    bookStore.fetchBooks(); 
   } else {
     notifStore.add(result.message, 'error');
   }

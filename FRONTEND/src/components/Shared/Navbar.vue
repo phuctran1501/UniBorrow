@@ -68,6 +68,7 @@ const authStore = useAuthStore();
 .navbar {
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.9) !important;
+  z-index: 1030;
 }
 
 .nav-link {

@@ -38,7 +38,7 @@
         <button class="btn d-lg-none text-primary fs-3 p-0 border-0 shadow-none">
           <i class="bi bi-list"></i>
         </button>
-        <div class="fw-bold text-muted small ms-lg-0 ms-3">QUẢN TRỊ UniBorrow</div>
+        <div class="fw-bold text-muted small ms-lg-0 ms-3">QUẢN TRỊ UNIBORROW</div>
         <div class="d-flex align-items-center">
           <div class="user-profile d-flex align-items-center gap-3 py-1 px-3">
             <div class="text-end d-none d-md-block">

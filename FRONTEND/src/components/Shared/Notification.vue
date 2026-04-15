@@ -3,7 +3,7 @@
     <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 2000">
       <transition-group name="toast">
         <div 
-          v-for="msg in messages" 
+          v-for="msg in notifStore.messages" 
           :key="msg.id"
           class="toast show shadow-lg border-0 rounded-4 mb-3 overflow-hidden" 
           :class="msg.type === 'error' ? 'bg-danger text-white' : 'bg-success text-white'"
@@ -12,7 +12,7 @@
           <div class="d-flex align-items-center p-3">
             <i :class="['bi fs-4 me-3', msg.type === 'error' ? 'bi-exclamation-circle' : 'bi-check-circle']"></i>
             <div class="fw-medium">{{ msg.text }}</div>
-            <button @click="$emit('close', msg.id)" type="button" class="btn-close btn-close-white ms-auto shadow-none"></button>
+            <button @click="notifStore.remove(msg.id)" type="button" class="btn-close btn-close-white ms-auto shadow-none"></button>
           </div>
         </div>
       </transition-group>
@@ -21,10 +21,8 @@
 </template>
 
 <script setup>
-defineProps({
-  messages: Array 
-});
-defineEmits(['close']); 
+import { useNotificationStore } from '../../store/notificationStore';
+const notifStore = useNotificationStore();
 </script>
 
 <style scoped>

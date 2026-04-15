@@ -9,6 +9,7 @@ export const useBookStore = defineStore('book', {
     currentPage: 1,  
     recentBooks: [],  
     publishers: [],   
+    currentBook: null, 
     loading: false,   
     error: null      
   }),
@@ -55,6 +56,19 @@ export const useBookStore = defineStore('book', {
       } catch (error) {
         this.error = error.response?.data?.message || 'Không thể tải danh sách sách';
         this.books = [];
+      } finally {
+        this.loading = false;
+      }
+    },
+    async fetchBookById(id) {
+      this.loading = true;
+      this.currentBook = null;
+      try {
+        const { data } = await api.get(`/sach/${id}`);
+        this.currentBook = data;
+      } catch (error) {
+        this.error = error.response?.data?.message || 'Không thể tải thông tin sách';
+        console.error('Lỗi khi tải chi tiết sách:', error);
       } finally {
         this.loading = false;
       }

@@ -6,6 +6,28 @@
         <i class="bi bi-plus-lg me-2"></i> Thêm nhà xuất bản
       </button>
     </div>
+
+    <div class="row mb-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="search-box position-relative">
+          <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+          <input 
+            type="text" 
+            class="form-control rounded-pill ps-5 py-2 border shadow-sm" 
+            placeholder="Tìm kiếm nhà xuất bản..."
+            v-model="searchQuery"
+          >
+          <button 
+            v-if="searchQuery" 
+            class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 text-muted p-0 border-0 shadow-none"
+            @click="searchQuery = ''"
+          >
+            <i class="bi bi-x-circle-fill"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
       <div class="table-responsive">
         <table class="table table-hover mb-0 align-middle">
@@ -22,10 +44,10 @@
                 <div class="spinner-border text-primary" role="status"></div>
               </td>
             </tr>
-            <tr v-else-if="adminStore.publishers.length === 0">
-              <td colspan="3" class="text-center py-5 text-muted">Chưa có nhà xuất bản nào.</td>
+            <tr v-else-if="filteredPublishers.length === 0">
+              <td colspan="3" class="text-center py-5 text-muted">Không tìm thấy nhà xuất bản nào.</td>
             </tr>
-            <tr v-for="nxb in adminStore.publishers" :key="nxb._id">
+            <tr v-for="nxb in filteredPublishers" :key="nxb._id">
               <td class="px-4 py-3 border-0 fw-bold">{{ nxb.TenNXB }}</td>
               <td class="py-3 border-0">{{ nxb.DiaChi }}</td>
               <td class="py-3 border-0 text-end px-4">
@@ -42,7 +64,6 @@
       </div>
     </div>
 
-    <!-- Add/Edit Modal -->
     <Teleport to="body">
       <div v-if="showModal" class="modal-backdrop fade show" style="z-index: 1060;"></div>
       <div v-if="showModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1070;">
@@ -78,7 +99,7 @@
 
 <script setup>
 
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, computed } from 'vue';
 import { useAdminStore } from '../store/adminStore';
 import { useNotificationStore } from '../store/notificationStore';
 import Notification from '../components/Shared/Notification.vue';
@@ -90,6 +111,16 @@ const showModal = ref(false);
 const isEditing = ref(false);    
 const currentId = ref(null);   
 const loading = ref(false);     
+const searchQuery = ref('');
+
+const filteredPublishers = computed(() => {
+  if (!searchQuery.value) return adminStore.publishers;
+  const q = searchQuery.value.toLowerCase();
+  return adminStore.publishers.filter(p => 
+    p.TenNXB.toLowerCase().includes(q) || 
+    (p.DiaChi && p.DiaChi.toLowerCase().includes(q))
+  );
+});
 
 const form = reactive({
   TenNXB: '',

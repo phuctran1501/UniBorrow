@@ -1,7 +1,7 @@
 <template>
   <div class="container py-5">
     <div class="row">
-      <div class="col-lg-3 d-none d-lg-block sticky-top" style="top: 100px; height: fit-content;">
+      <div class="col-lg-3 d-none d-lg-block sticky-top" style="top: 130px; height: fit-content;">
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
           <div class="card-header bg-primary text-white text-center py-3 fw-bold border-0">
             Mục lục

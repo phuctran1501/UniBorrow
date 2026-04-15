@@ -2,7 +2,17 @@ const mongoose = require('mongoose');
 
 const theoDoiMuonSachSchema = new mongoose.Schema(
     {
-        MaDocGia: { type: mongoose.Schema.Types.ObjectId, ref: 'DocGia', required: true },
+        MaDocGia: { 
+            type: mongoose.Schema.Types.ObjectId, 
+            required: true, 
+            refPath: 'onModel' 
+        },
+        onModel: {
+            type: String,
+            required: true,
+            enum: ['DocGia', 'NhanVien'],
+            default: 'DocGia'
+        },
         MaSach: { type: mongoose.Schema.Types.ObjectId, ref: 'Sach', required: true },
         NgayMuon: { type: Date, default: null }, 
         NgayTra: { type: Date, default: null }, 

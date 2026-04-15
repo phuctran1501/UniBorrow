@@ -143,11 +143,91 @@
             :key="book._id" 
             :class="viewMode === 'grid' ? 'col-xl-3 col-lg-4 col-md-6' : 'col-12'"
           >
-            <BookCard 
-              :book="book" 
-              :viewMode="viewMode"
-              @borrow="onBorrow" 
-            />
+            <!-- Inlined Book Card UI -->
+            <div 
+              class="card h-100 UniBorrow-card border-0 shadow-sm overflow-hidden" 
+              :class="{ 'list-view-row': viewMode === 'list' }"
+              @click="router.push({ name: 'book-details', params: { id: book._id } })"
+              style="cursor: pointer;"
+            >
+              <div 
+                class="card-img-top-wrapper position-relative overflow-hidden bg-light flex-shrink-0" 
+                :style="viewMode === 'list' ? 'width: 160px; height: 100%;' : 'height: 180px;'"
+              >
+                <div v-if="!book.HinhAnh" class="d-flex align-items-center justify-content-center h-100 text-muted bg-secondary-subtle">
+                  <i class="bi bi-book fs-2"></i>
+                </div>
+                <img v-else :src="book.HinhAnh" :alt="book.TenSach" class="card-img-top h-100 w-100 object-fit-cover transition-transform">
+                
+                <div class="status-badge position-absolute top-0 end-0 m-2">
+                  <span :class="['badge rounded-pill px-2 py-1', book.SoQuyen > 0 ? 'bg-success' : 'bg-danger shadow-sm']" style="font-size: 0.7rem;">
+                    {{ book.SoQuyen > 0 ? 'Sẵn sàng' : 'Đã hết' }}
+                  </span>
+                </div>
+              </div>
+              
+              <div class="card-body p-0 d-flex flex-column flex-grow-1">
+                <div :class="{ 'd-flex h-100 flex-column flex-md-row': viewMode === 'list' }">
+                  <div class="p-3 flex-grow-1 border-end-md" :class="{ 'd-flex flex-column': viewMode === 'list' }">
+                    <h6 class="card-title fw-bold text-dark mb-1 text-truncate" style="font-size: 0.95rem; line-height: 1.4;" :title="book.TenSach">
+                      {{ book.TenSach }}
+                    </h6>
+                    
+                    <div class="mb-2">
+                      <span class="fw-bold text-primary">{{ new Intl.NumberFormat('vi-VN').format(book.DonGia || 0) }} VNĐ</span>
+                    </div>
+                    <p v-if="viewMode === 'list'" class="text-muted mb-0 mt-2 line-clamp-3 d-none d-md-block" style="font-size: 0.8rem; line-height: 1.5; max-height: 3.6rem;">
+                      {{ book.MoTa || 'Hệ thống UniBorrow cung cấp trải nghiệm mượn sách hiện đại và nhanh chóng.' }}
+                    </p>
+
+                    <div v-if="viewMode === 'grid'" class="mt-auto pt-2 border-top">
+                      <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex flex-column">
+                           <span class="x-small-text fw-bold text-muted text-uppercase mb-0">Số lượng:</span>
+                           <span :class="['fw-bold', book.SoQuyen > 0 ? 'text-primary' : 'text-danger']" style="font-size: 0.9rem;">{{ book.SoQuyen }}</span>
+                        </div>
+                        
+                        <!-- Quantity Selector Grid -->
+                        <div v-if="book.SoQuyen > 0" class="quantity-selector d-flex align-items-center bg-light rounded-pill p-1" @click.stop>
+                          <button class="btn btn-sm btn-light rounded-circle border-0 p-0 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;" :disabled="getQuantity(book._id) <= 1" @click="setQuantity(book._id, getQuantity(book._id) - 1)">
+                            <i class="bi bi-dash"></i>
+                          </button>
+                          <span class="mx-2 fw-bold" style="min-width: 12px; text-align: center; font-size: 0.85rem;">{{ getQuantity(book._id) }}</span>
+                          <button class="btn btn-sm btn-light rounded-circle border-0 p-0 d-flex align-items-center justify-content-center" style="width: 24px; height: 24px;" :disabled="getQuantity(book._id) >= 5 || getQuantity(book._id) >= book.SoQuyen" @click="setQuantity(book._id, getQuantity(book._id) + 1)">
+                            <i class="bi bi-plus"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <button class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm" :disabled="book.SoQuyen <= 0" @click.stop="onBorrow(book)">
+                        {{ book.SoQuyen > 0 ? 'Mượn sách' : 'Hết hàng' }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div v-if="viewMode === 'list'" class="action-column bg-light-subtle p-3 d-flex flex-column justify-content-center align-items-center border-start" style="min-width: 180px;">
+                    <div class="mb-3 text-center">
+                       <span class="x-small-text fw-bold text-muted text-uppercase d-block mb-1">Số lượng:</span>
+                       <span :class="['fw-bold fs-5', book.SoQuyen > 0 ? 'text-primary' : 'text-danger']">{{ book.SoQuyen }}</span>
+                    </div>
+
+                    <!-- Quantity Selector List -->
+                    <div v-if="book.SoQuyen > 0" class="quantity-selector d-flex align-items-center bg-white shadow-sm rounded-pill p-1 mb-3" @click.stop>
+                        <button class="btn btn-sm btn-light rounded-circle border-0 p-0 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;" :disabled="getQuantity(book._id) <= 1" @click="setQuantity(book._id, getQuantity(book._id) - 1)">
+                          <i class="bi bi-dash"></i>
+                        </button>
+                        <span class="mx-3 fw-bold" style="min-width: 15px; text-align: center;">{{ getQuantity(book._id) }}</span>
+                        <button class="btn btn-sm btn-light rounded-circle border-0 p-0 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;" :disabled="getQuantity(book._id) >= 5 || getQuantity(book._id) >= book.SoQuyen" @click="setQuantity(book._id, getQuantity(book._id) + 1)">
+                          <i class="bi bi-plus"></i>
+                        </button>
+                    </div>
+
+                    <button class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm" :disabled="book.SoQuyen <= 0" @click.stop="onBorrow(book)">
+                      {{ book.SoQuyen > 0 ? 'Mượn ngay' : 'Hết hàng' }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -175,28 +255,30 @@
       </main>
     </div>
 
-    <Notification 
-      :messages="notifStore.messages" 
-      @close="notifStore.remove" 
-    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useBookStore } from '../store/bookStore';
 import { useAuthStore } from '../store/authStore';
 import { useNotificationStore } from '../store/notificationStore';
-import BookCard from '../components/Reader/BookCard.vue';
-import Notification from '../components/Shared/Notification.vue';
+
 
 const route = useRoute();
+const router = useRouter();
 const bookStore = useBookStore();
 const authStore = useAuthStore();
 const notifStore = useNotificationStore();
 
 const viewMode = ref('grid');
+
+const quantities = ref({}); 
+const getQuantity = (bookId) => quantities.value[bookId] || 1;
+const setQuantity = (bookId, val) => {
+  quantities.value[bookId] = val;
+};
 
 const genres = ['Công nghệ', 'Kinh tế', 'Giáo dục', 'Tiểu thuyết', 'Văn học', 'Thiếu nhi'];
 
@@ -258,9 +340,12 @@ const clearFilters = () => {
   handleSearch();
 };
 
-const onBorrow = async ({ book, quantity }) => {
+const onBorrow = async (book) => {
+  const quantity = getQuantity(book._id);
+  
   if (!authStore.isAuthenticated) {
     notifStore.add('Vui lòng đăng nhập để mượn sách', 'error');
+    router.push('/login');
     return;
   }
   
@@ -302,12 +387,54 @@ watch(() => route.query.q, (newVal) => {
 .max-h-300 { max-height: 300px; }
 .cursor-pointer { cursor: pointer; }
 
+.UniBorrow-card { transition: all 0.3s ease; }
+.UniBorrow-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+.transition-transform { transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); }
+.UniBorrow-card:hover .transition-transform { transform: scale(1.08); }
+
+.quantity-selector button {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.quantity-selector button:hover:not(:disabled) {
+  background-color: #e9ecef !important;
+}
+
+.list-view-row {
+  flex-direction: row !important;
+  max-height: 250px;
+  border: 1px solid transparent !important;
+  transition: all 0.3s ease;
+}
+.list-view-row:hover {
+  border-color: rgba(13, 110, 253, 0.2) !important;
+  transform: translateY(-3px);
+}
+
+.line-clamp-3 {
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  overflow: hidden; text-overflow: ellipsis;
+}
+
+.bg-light-subtle { background-color: #f8fafc; }
+.x-small-text { font-size: 0.65rem; letter-spacing: 0.05em; }
+
+@media (min-width: 768px) { .border-end-md { border-right: 1px solid #e2e8f0; } }
+@media (max-width: 768px) {
+  .list-view-row { flex-direction: column !important; max-height: none; }
+  .list-view-row .card-img-top-wrapper { width: 100% !important; height: 200px !important; }
+  .action-column { border-top: 1px solid #e2e8f0; border-left: none !important; width: 100%; }
+}
+
 .filter-sidebar {
   transition: all 0.3s ease;
   z-index: 1000; 
-  top: 90px !important; 
+  top: 120px !important; 
 }
-
 .custom-check {
   cursor: pointer;
   width: 18px;

@@ -62,6 +62,22 @@
       </div>
     </section>
 
+    <section class="quote-section py-5">
+      <div class="container position-relative z-1 text-center">
+        <div class="quote-content py-5">
+          <i class="bi bi-quote fs-1 text-primary opacity-25 mb-4 d-block"></i>
+          <h2 class="quote-text display-6 fw-bold mb-4 px-lg-5">
+            "Việc đọc rất quan trọng. Nếu bạn biết cách đọc, <br class="d-none d-md-block"> cả thế giới sẽ mở ra cho bạn."
+          </h2>
+          <div class="quote-author-wrap d-flex align-items-center justify-content-center gap-3">
+            <div class="line w-30px bg-primary opacity-50" style="height: 2px;"></div>
+            <span class="quote-author fw-bold text-primary tracking-widest text-uppercase small">Barack Obama</span>
+            <div class="line w-30px bg-primary opacity-50" style="height: 2px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="recent-books-section py-5">
       <div class="container">
 
@@ -91,7 +107,7 @@
               <p class="x-small text-muted mb-2 text-truncate px-1">{{ book.TacGia }}</p>
 
               <router-link
-                :to="{ name: 'library', query: { q: book.TenSach } }"
+                :to="{ name: 'book-details', params: { id: book._id } }"
                 class="btn btn-sm btn-primary rounded-pill w-100 py-1 fw-bold"
                 style="font-size: 0.65rem;"
               >Xem ngay</router-link>
@@ -339,29 +355,21 @@ onMounted(async () => {
 }
 
 .quote-text {
-  font-style: italic;
-  letter-spacing: -0.01em;
-  color: #2d3748;
+  color: #1e293b;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
 }
 
-.quote-bg-circle {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, var(--primary-color) 0%, transparent 70%);
-  filter: blur(100px);
-  z-index: 0;
+.tracking-widest {
+  letter-spacing: 0.2em;
+}
+
+.w-30px {
+  width: 30px;
 }
 
 .opacity-05 {
   opacity: 0.05;
-}
-
-.text-primary-subtle {
-  color: rgba(var(--primary-rgb), 0.2) !important;
-}
-
-.line {
-  opacity: 0.5;
 }
 
 .new-book-card {

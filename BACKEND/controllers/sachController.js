@@ -1,6 +1,7 @@
 const Sach = require('../models/Sach');
 const TheoDoiMuonSach = require('../models/TheoDoiMuonSach');
 const DocGia = require('../models/DocGia');
+const mongoose = require('mongoose');
 const { sendEmail } = require('../utils/emailService');
 const { checkOverdueBorrows } = require('../utils/cronJobs');
 
@@ -56,10 +57,26 @@ const getBooks = async (req, res) => {
     }
 };
 
+const getBookById = async (req, res) => {
+    try {
+        const book = await Sach.findById(req.params.id).populate('MaNXB', 'TenNXB');
+        if (!book) {
+            return res.status(404).json({ message: 'Không tìm thấy sách' });
+        }
+        res.json(book);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const registerMuonSach = async (req, res) => {
     try {
         const sachId = req.params.id;
         const docGiaId = req.user._id;
+
+        if (!mongoose.Types.ObjectId.isValid(sachId)) {
+            return res.status(400).json({ message: 'ID sách không hợp lệ' });
+        }
 
         const sach = await Sach.findById(sachId);
         if (!sach) {
@@ -75,20 +92,22 @@ const registerMuonSach = async (req, res) => {
             TrangThai: 'QuaHan',
         });
         if (dangPhat) {
-            return res.status(400).json({ message: 'Bạn có sách quá hạn chưa trả, không thể mượn thêm' });
+            return res.status(400).json({ message: 'Bạn đang có sách quá hạn chưa trả, không thể mượn thêm sách mới' });
         }
 
         const dangMuonCount = await TheoDoiMuonSach.countDocuments({
             MaDocGia: docGiaId,
             TrangThai: { $in: ['ChoDuyet', 'DangMuon'] }
         });
+        
         if (dangMuonCount >= 5) {
-            return res.status(400).json({ message: 'Bạn chỉ được mượn tối đa 5 quyển sách cùng lúc' });
+            return res.status(400).json({ message: `Bạn đã đạt giới hạn 5 phiếu mượn (đang có ${dangMuonCount} phiếu). Vui lòng trả sách hoặc đợi duyệt để tiếp tục.` });
         }
 
         const phieuMuon = await TheoDoiMuonSach.create({
             MaDocGia: docGiaId,
             MaSach: sachId,
+            onModel: req.userRole || 'DocGia',
             TrangThai: 'ChoDuyet'
         });
 
@@ -244,7 +263,13 @@ const payFine = async (req, res) => {
 
 const getMyBorrows = async (req, res) => {
     try {
-        const data = await TheoDoiMuonSach.find({ MaDocGia: req.user._id }).populate('MaSach', 'TenSach TacGia');
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({ message: 'Không xác định được người dùng' });
+        }
+        
+        const data = await TheoDoiMuonSach.find({ MaDocGia: req.user._id })
+            .populate('MaSach', 'TenSach TacGia HinhAnh')
+            .sort({ createdAt: -1 });
         
         const now = new Date();
         const overdueIds = data
@@ -252,12 +277,10 @@ const getMyBorrows = async (req, res) => {
             .map(phieu => phieu._id);
 
         if (overdueIds.length > 0) {
-            
             await TheoDoiMuonSach.updateMany(
                 { _id: { $in: overdueIds } },
                 { $set: { TrangThai: 'QuaHan' } }
             );
-            
             data.forEach(p => {
                 if (overdueIds.includes(p._id)) p.TrangThai = 'QuaHan';
             });
@@ -289,7 +312,7 @@ const getRecentBooks = async (req, res) => {
 };
 
 module.exports = {
-    getBooks, registerMuonSach, cancelMuonSach, 
+    getBooks, getBookById, registerMuonSach, cancelMuonSach, 
     createBook, updateBook, deleteBook,
     approveBorrow, rejectBorrow, returnBook, payFine,
     getMyBorrows, getAllBorrows, getRecentBooks
