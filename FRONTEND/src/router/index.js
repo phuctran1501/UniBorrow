@@ -41,6 +41,11 @@ const routes = [
         path: 'my-borrows',
         name: 'my-borrows',
         component: () => import('../views/MyBorrows.vue'), 
+      },
+      {
+        path: 'favorites',
+        name: 'favorites',
+        component: () => import('../views/FavoritesView.vue'),
       }
     ],
   },

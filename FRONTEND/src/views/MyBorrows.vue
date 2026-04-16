@@ -3,7 +3,6 @@
     <div class="row mb-3">
       <div class="col-12">
         <h2 class="fw-bold text-primary mb-1">Theo dõi mượn trả</h2>
-        <p class="text-muted mb-0">Xem trạng thái các yêu cầu mượn sách và lịch sử trả sách của bạn.</p>
       </div>
     </div>
 

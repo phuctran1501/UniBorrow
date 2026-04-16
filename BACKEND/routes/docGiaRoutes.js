@@ -90,6 +90,60 @@ router.post('/register', registerDocGia);
  */
 router.post('/login', loginDocGia);
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     DocGia:
+ *       type: object
+ *       required: [Email, Ten, HoLot, Password]
+ *       properties:
+ *         Email:
+ *           type: string
+ *         Password:
+ *           type: string
+ *         HoLot:
+ *           type: string
+ *         Ten:
+ *           type: string
+ *         NgaySinh:
+ *           type: string
+ *           format: date
+ *         Phai:
+ *           type: string
+ *           enum: [Nam, Nữ, Khác]
+ *         DiaChi:
+ *           type: string
+ *         DienThoai:
+ *           type: string
+ *         HinhAnh:
+ *           type: string
+ *         TrangThai:
+ *           type: string
+ *           enum: [Active, Locked]
+ */
+
+/**
+ * @swagger
+ * /api/docgia/social-login:
+ *   post:
+ *     summary: Đăng nhập bằng Google/Mạng xã hội
+ *     tags: [Độc Giả]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               credential:
+ *                 type: string
+ *                 description: JWT Token từ Google
+ *     responses:
+ *       200:
+ *         description: Đăng nhập thành công
+ */
 router.post('/social-login', socialLoginDocGia);
 
 /**
@@ -98,6 +152,8 @@ router.post('/social-login', socialLoginDocGia);
  *   get:
  *     summary: Lấy thông tin cá nhân của Độc giả
  *     tags: [Độc Giả]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Thông tin độc giả hiện tại

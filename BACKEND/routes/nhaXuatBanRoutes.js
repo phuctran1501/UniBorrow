@@ -5,6 +5,22 @@ const { protect, nhanVienOnly } = require('../middlewares/authMiddleware');
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     NhaXuatBan:
+ *       type: object
+ *       required: [TenNXB, DiaChi]
+ *       properties:
+ *         _id:
+ *           type: string
+ *         TenNXB:
+ *           type: string
+ *         DiaChi:
+ *           type: string
+ */
+
+/**
+ * @swagger
  * tags:
  *   name: Nhà Xuất Bản
  *   description: Quản lý nhà xuất bản

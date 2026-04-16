@@ -44,6 +44,17 @@
                   </div>
                 </div>
               </div>
+
+              <div v-if="authStore.role === 'DocGia'" class="mt-3 text-center">
+                <button 
+                  @click="handleToggleFavorite" 
+                  class="btn btn-outline-danger w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 py-2 transition-all fw-medium"
+                  :class="{'bg-danger text-white': isFavorite}"
+                >
+                  <i :class="['bi', isFavorite ? 'bi-heart-fill' : 'bi-heart']"></i>
+                  {{ isFavorite ? 'Đã yêu thích' : 'Thêm vào yêu thích' }}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -137,6 +148,7 @@ const notifStore = useNotificationStore();
 
 const quantity = ref(1);
 const borrowing = ref(false);
+const isFavorite = ref(false);
 
 const book = computed(() => bookStore.currentBook || {});
 
@@ -184,8 +196,27 @@ const handleBorrow = async () => {
   }
 };
 
-onMounted(() => {
-  bookStore.fetchBookById(route.params.id);
+const handleToggleFavorite = async () => {
+  if (!authStore.isAuthenticated) {
+    notifStore.add('Vui lòng đăng nhập để yêu thích sách', 'error');
+    router.push('/login');
+    return;
+  }
+
+  const result = await bookStore.toggleFavorite(book.value._id);
+  if (result.success) {
+    isFavorite.value = result.isFavorite;
+    notifStore.add(result.message, 'success');
+  } else {
+    notifStore.add(result.message, 'error');
+  }
+};
+
+onMounted(async () => {
+  await bookStore.fetchBookById(route.params.id);
+  if (authStore.isAuthenticated && authStore.role === 'DocGia') {
+    isFavorite.value = await bookStore.checkIsFavorite(route.params.id);
+  }
   window.scrollTo(0, 0);
 });
 </script>

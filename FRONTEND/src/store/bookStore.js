@@ -11,7 +11,8 @@ export const useBookStore = defineStore('book', {
     publishers: [],   
     currentBook: null, 
     loading: false,   
-    error: null      
+    error: null,
+    favorites: []      
   }),
 
   actions: {
@@ -82,6 +83,38 @@ export const useBookStore = defineStore('book', {
           success: false, 
           message: error.response?.data?.message || 'Không thể đăng ký mượn sách' 
         };
+      }
+    },
+    async fetchFavorites() {
+      this.loading = true;
+      try {
+        const { data } = await api.get('/yeuthich');
+        this.favorites = data;
+      } catch (error) {
+        console.error('Lỗi khi tải danh sách yêu thích:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async toggleFavorite(sachId) {
+      try {
+        const { data } = await api.post(`/yeuthich/toggle/${sachId}`);
+        // Refresh favorites list if we are on favorites page
+        await this.fetchFavorites();
+        return { success: true, isFavorite: data.isFavorite, message: data.message };
+      } catch (error) {
+        return { 
+          success: false, 
+          message: error.response?.data?.message || 'Không thể thực hiện yêu thích' 
+        };
+      }
+    },
+    async checkIsFavorite(sachId) {
+      try {
+        const { data } = await api.get(`/yeuthich/check/${sachId}`);
+        return data.isFavorite;
+      } catch (error) {
+        return false;
       }
     }
   }

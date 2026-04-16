@@ -5,6 +5,29 @@ const { protect, admin } = require('../middlewares/authMiddleware');
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     NhanVien:
+ *       type: object
+ *       required: [Email, Password, HoTenNV, ChucVu]
+ *       properties:
+ *         Email:
+ *           type: string
+ *         Password:
+ *           type: string
+ *         HoTenNV:
+ *           type: string
+ *         ChucVu:
+ *           type: string
+ *           enum: [Admin, Nhân viên]
+ *         DiaChi:
+ *           type: string
+ *         SoDienThoai:
+ *           type: string
+ */
+
+/**
+ * @swagger
  * tags:
  *   name: Nhân Viên
  *   description: Quản lý đăng nhập và tài khoản nhân sự (Dành cho Admin)

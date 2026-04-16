@@ -39,6 +39,12 @@
             </router-link>
           </template>
           <template v-else>
+            <router-link v-if="authStore.role === 'DocGia'" to="/favorites" class="btn btn-link text-primary p-0 position-relative me-2">
+              <i class="bi bi-heart fs-4"></i>
+              <span v-if="bookStore.favorites.length > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                {{ bookStore.favorites.length }}
+              </span>
+            </router-link>
             <div class="d-flex align-items-center me-3 border-end pe-3">
               <i class="bi bi-person-circle fs-4 me-2 text-primary"></i>
               <div class="d-flex flex-column line-height-1">
@@ -59,7 +65,17 @@
 <script setup>
 
 import { useAuthStore } from '../../store/authStore';
+import { useBookStore } from '../../store/bookStore';
+import { onMounted } from 'vue';
+
 const authStore = useAuthStore();
+const bookStore = useBookStore();
+
+onMounted(() => {
+  if (authStore.isAuthenticated && authStore.role === 'DocGia') {
+    bookStore.fetchFavorites();
+  }
+});
 </script>
 
 <style scoped>
