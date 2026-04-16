@@ -28,7 +28,6 @@
 
       <div class="chat-body p-3 custom-scrollbar" ref="messageContainer">
         <div v-if="messages.length === 0" class="welcome-text text-center py-4">
-          <i class="bi bi-stars text-warning fs-1 mb-2"></i>
           <p class="small text-muted mb-0">Xin chào! Tôi là trợ lý ảo của UniBorrow. Bạn cần tìm sách gì hôm nay?</p>
         </div>
 
