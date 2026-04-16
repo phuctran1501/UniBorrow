@@ -4,11 +4,13 @@ const Sach = require('../models/Sach');
 const toggleFavorite = async (req, res) => {
     try {
         const sachId = req.params.sachId;
-        const readerId = req.user._id;
+        const userId = req.user._id;
+        const userRole = req.userRole;
 
         const existingFavorite = await YeuThich.findOne({ 
-            MaDocGia: readerId, 
-            MaSach: sachId 
+            MaDocGia: userId, 
+            MaSach: sachId,
+            onModel: userRole
         });
 
         if (existingFavorite) {
@@ -20,8 +22,9 @@ const toggleFavorite = async (req, res) => {
             });
         } else {
             await YeuThich.create({ 
-                MaDocGia: readerId, 
-                MaSach: sachId 
+                MaDocGia: userId, 
+                MaSach: sachId,
+                onModel: userRole
             });
             return res.status(201).json({ 
                 success: true, 
@@ -37,9 +40,10 @@ const toggleFavorite = async (req, res) => {
 
 const getFavorites = async (req, res) => {
     try {
-        const readerId = req.user._id;
+        const userId = req.user._id;
+        const userRole = req.userRole;
         
-        const favorites = await YeuThich.find({ MaDocGia: readerId })
+        const favorites = await YeuThich.find({ MaDocGia: userId, onModel: userRole })
             .populate({
                 path: 'MaSach',
                 populate: { path: 'MaNXB' }
@@ -60,11 +64,13 @@ const getFavorites = async (req, res) => {
 const checkFavorite = async (req, res) => {
     try {
         const sachId = req.params.sachId;
-        const readerId = req.user._id;
+        const userId = req.user._id;
+        const userRole = req.userRole;
 
         const favorite = await YeuThich.findOne({ 
-            MaDocGia: readerId, 
-            MaSach: sachId 
+            MaDocGia: userId, 
+            MaSach: sachId,
+            onModel: userRole
         });
 
         res.status(200).json({ isFavorite: !!favorite });

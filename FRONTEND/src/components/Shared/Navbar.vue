@@ -39,7 +39,7 @@
             </router-link>
           </template>
           <template v-else>
-            <router-link v-if="authStore.role === 'DocGia'" to="/favorites" class="btn btn-link text-primary p-0 position-relative me-2">
+            <router-link to="/favorites" class="btn btn-link text-primary p-0 position-relative me-2">
               <i class="bi bi-heart fs-4"></i>
               <span v-if="bookStore.favorites.length > 0" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
                 {{ bookStore.favorites.length }}
@@ -72,7 +72,7 @@ const authStore = useAuthStore();
 const bookStore = useBookStore();
 
 onMounted(() => {
-  if (authStore.isAuthenticated && authStore.role === 'DocGia') {
+  if (authStore.isAuthenticated) {
     bookStore.fetchFavorites();
   }
 });

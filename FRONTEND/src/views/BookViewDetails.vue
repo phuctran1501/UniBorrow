@@ -45,7 +45,7 @@
                 </div>
               </div>
 
-              <div v-if="authStore.role === 'DocGia'" class="mt-3 text-center">
+              <div v-if="authStore.isAuthenticated" class="mt-3 text-center">
                 <button 
                   @click="handleToggleFavorite" 
                   class="btn btn-outline-danger w-100 rounded-pill d-flex align-items-center justify-content-center gap-2 py-2 transition-all fw-medium"

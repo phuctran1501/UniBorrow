@@ -1,17 +1,26 @@
 <template>
   <div class="favorites-page py-5 min-vh-100 bg-light">
     <div class="container container-large">
-      <!-- Header Section -->
-      <div class="mb-4">
-        <h2 class="fw-bold text-primary mb-1 tracking-tight">Thư viện yêu thích</h2>
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div>
+          <h2 class="fw-bold text-primary mb-1 tracking-tight">Thư viện yêu thích</h2>
+        </div>
+        
+        <div class="search-container position-relative" style="max-width: 400px; width: 100%;">
+          <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+          <input 
+            v-model="searchQuery" 
+            type="text" 
+            class="form-control rounded-pill ps-5 py-2 border-0 shadow-sm" 
+            placeholder="Tìm tên sách, tác giả..."
+          >
+        </div>
       </div>
 
-      <!-- Loading State -->
       <div v-if="bookStore.loading" class="text-center py-5">
         <div class="spinner-border text-primary" role="status"></div>
       </div>
 
-      <!-- Empty State -->
       <div v-else-if="bookStore.favorites.length === 0" class="text-center py-5 bg-white rounded-4 shadow-sm border mt-4">
         <div class="display-4 text-muted opacity-25 mb-3"><i class="bi bi-heart"></i></div>
         <h5 class="fw-bold text-dark">Danh sách yêu thích đang trống</h5>
@@ -20,17 +29,19 @@
         </router-link>
       </div>
 
-      <!-- Favorites Grid - Wrapped in col-lg-10 to match library proportions -->
       <div v-else class="row justify-content-center">
-        <div class="col-xxl-10 col-xl-11">
+        <div v-if="filteredBooks.length === 0" class="text-center py-5">
+          <i class="bi bi-search display-4 text-muted opacity-25"></i>
+          <p class="text-muted mt-3">Không tìm thấy sách yêu thích nào khớp với từ khóa.</p>
+        </div>
+        <div v-else class="col-xxl-10 col-xl-11">
           <div class="row g-4">
-            <div v-for="book in bookStore.favorites" :key="book._id" class="col-xxl-3 col-xl-3 col-lg-4 col-md-6 col-sm-6">
+            <div v-for="book in filteredBooks" :key="book._id" class="col-xxl-3 col-xl-3 col-lg-4 col-md-6 col-sm-6">
               <div 
                 class="card h-100 UniBorrow-card border-0 shadow-sm overflow-hidden position-relative" 
                 @click="router.push({ name: 'book-details', params: { id: book._id } })"
                 style="cursor: pointer; border-radius: 1.25rem !important;"
               >
-            <!-- Delete Button (Top Left) -->
             <button 
               @click.stop="handleRemoveFavorite(book._id)" 
               class="btn btn-remove-x-small shadow-sm" 
@@ -39,14 +50,12 @@
               <i class="bi bi-x-lg"></i>
             </button>
 
-            <!-- Image Area - Reduced height to 180px -->
             <div class="img-container position-relative bg-light" style="height: 180px;">
               <div v-if="!book.HinhAnh" class="h-100 d-flex align-items-center justify-content-center text-muted">
                 <i class="bi bi-book fs-2"></i>
               </div>
               <img v-else :src="book.HinhAnh" :alt="book.TenSach" class="w-100 h-100 object-fit-cover card-img">
               
-              <!-- Status Badge (Top Right) -->
               <div class="position-absolute top-0 end-0 m-2">
                 <span :class="['badge rounded-pill px-2 py-1', book.SoQuyen > 0 ? 'bg-success' : 'bg-danger']" style="font-size: 0.65rem;">
                   {{ book.SoQuyen > 0 ? 'Sẵn sàng' : 'Đã hết' }}
@@ -83,7 +92,6 @@
                 </div>
               </div>
 
-              <!-- Primary Color Button -->
               <button 
                 class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-none text-sm" 
                 :disabled="book.SoQuyen <= 0 || borrowingId === book._id" 
@@ -103,7 +111,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, computed } from 'vue';
 import { useBookStore } from '../store/bookStore';
 import { useNotificationStore } from '../store/notificationStore';
 import { useRouter } from 'vue-router';
@@ -112,8 +120,19 @@ const bookStore = useBookStore();
 const notifStore = useNotificationStore();
 const router = useRouter();
 
+const searchQuery = ref('');
 const borrowingId = ref(null);
 const quantities = reactive({});
+
+const filteredBooks = computed(() => {
+  if (!searchQuery.value.trim()) return bookStore.favorites;
+  
+  const query = searchQuery.value.toLowerCase();
+  return bookStore.favorites.filter(book => 
+    book.TenSach.toLowerCase().includes(query) || 
+    (book.TacGia && book.TacGia.toLowerCase().includes(query))
+  );
+});
 
 const handleRemoveFavorite = async (bookId) => {
   const result = await bookStore.toggleFavorite(bookId);

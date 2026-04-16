@@ -4,8 +4,14 @@ const yeuThichSchema = new mongoose.Schema(
     {
         MaDocGia: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'DocGia',
-            required: true
+            required: true,
+            refPath: 'onModel'
+        },
+        onModel: {
+            type: String,
+            required: true,
+            enum: ['DocGia', 'NhanVien'],
+            default: 'DocGia'
         },
         MaSach: {
             type: mongoose.Schema.Types.ObjectId,
@@ -18,6 +24,6 @@ const yeuThichSchema = new mongoose.Schema(
     }
 );
 
-yeuThichSchema.index({ MaDocGia: 1, MaSach: 1 }, { unique: true });
+yeuThichSchema.index({ MaDocGia: 1, MaSach: 1, onModel: 1 }, { unique: true });
 
 module.exports = mongoose.model('YeuThich', yeuThichSchema);
