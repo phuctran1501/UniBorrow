@@ -124,7 +124,7 @@
       </div>
     </div>
     
-    <Notification :messages="notifStore.messages" @close="notifStore.remove" />
+    <Notification :messages="notifStore.messages" />
   </div>
 </template>
 

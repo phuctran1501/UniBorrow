@@ -23,6 +23,7 @@
 <script setup>
 import { useNotificationStore } from '../../store/notificationStore';
 const notifStore = useNotificationStore();
+defineEmits(['close']);
 </script>
 
 <style scoped>

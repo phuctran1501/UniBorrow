@@ -7,11 +7,13 @@
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h5 class="fw-bold mb-0">Trạng thái phiếu mượn</h5>
           </div>
-          <div v-if="loading" class="d-flex justify-content-center align-items-center" style="height: 350px">
-            <div class="spinner-border text-primary opacity-50" role="status"></div>
-          </div>
-          <div v-else class="chart-container">
-            <apexchart height="350" type="donut" :options="chartOptions" :series="chartSeries"></apexchart>
+          <div class="position-relative" style="min-height: 350px">
+            <div v-if="loading" class="d-flex justify-content-center align-items-center h-100 position-absolute w-100" style="z-index: 2">
+              <div class="spinner-border text-primary opacity-50" role="status"></div>
+            </div>
+            <div v-show="!loading" class="chart-container">
+              <apexchart chart-id="admin-donut-chart" height="350" type="donut" :options="chartOptions" :series="chartSeries"></apexchart>
+            </div>
           </div>
         </div>
       </div>

@@ -1,17 +1,25 @@
 <template>
-  <div class="ai-chatbot-container">
+  <div 
+    class="ai-chatbot-container"
+    :style="{ bottom: dragPosition.y + 'px', right: dragPosition.x + 'px' }"
+    :class="{ 'dragging': isDragging }"
+    @mousedown="startDrag"
+  >
     <button 
       class="fab-btn shadow-lg" 
       :class="{ 'active': isOpen }"
       @click="toggleChat"
-      title="Chat với Trợ lý AI"
+      title="Khéo thả để thay đổi vị trí"
     >
       <i v-if="!isOpen" class="bi bi-robot fs-4"></i>
       <i v-else class="bi bi-x-lg fs-4"></i>
     </button>
 
-    <div v-if="isOpen" class="chat-window shadow-lg animate__animated animate__fadeInUp">
-      <div class="chat-header d-flex justify-content-between align-items-center p-3 bg-primary text-white rounded-top-4">
+    <div v-if="isOpen" class="chat-window shadow-lg animate__animated animate__fadeInUp" :style="windowStyles">
+      <div 
+        class="chat-header d-flex justify-content-between align-items-center p-3 bg-primary text-white rounded-top-4"
+        @mousedown.stop="startDrag"
+      >
         <div class="d-flex align-items-center gap-2">
           <div class="avatar-bg bg-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
             <i class="bi bi-robot text-primary"></i>
@@ -72,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch } from 'vue';
+import { ref, onMounted, nextTick, watch, computed } from 'vue';
 import axios from 'axios';
 import { marked } from 'marked';
 
@@ -82,7 +90,84 @@ const inputMessage = ref('');
 const messages = ref([]);
 const messageContainer = ref(null);
 
+const isDragging = ref(false);
+const dragPosition = ref({ x: 30, y: 30 }); 
+const dragStartMouse = { x: 0, y: 0 };
+const dragStartPosition = { x: 0, y: 0 };
+const wasMoved = ref(false);
+
+const startDrag = (e) => {
+  if (e.button !== 0) return;
+  
+  isDragging.value = true;
+  wasMoved.value = false;
+  
+  dragStartMouse.x = e.clientX;
+  dragStartMouse.y = e.clientY;
+  dragStartPosition.x = dragPosition.value.x;
+  dragStartPosition.y = dragPosition.value.y;
+
+  window.addEventListener('mousemove', onDrag);
+  window.addEventListener('mouseup', endDrag);
+};
+
+const onDrag = (e) => {
+  if (!isDragging.value) return;
+
+  const dx = dragStartMouse.x - e.clientX;
+  const dy = dragStartMouse.y - e.clientY;
+
+  if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+    wasMoved.value = true;
+  }
+
+  let newX = dragStartPosition.x + dx;
+  let newY = dragStartPosition.y + dy;
+
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
+  const chatWidth = isOpen.value ? 380 : 60;
+  const chatHeight = isOpen.value ? 480 : 60;
+
+  newX = Math.max(10, Math.min(newX, windowWidth - chatWidth - 10));
+  newY = Math.max(10, Math.min(newY, windowHeight - chatHeight - 10));
+
+  dragPosition.value.x = newX;
+  dragPosition.value.y = newY;
+};
+
+const endDrag = () => {
+  isDragging.value = false;
+  window.removeEventListener('mousemove', onDrag);
+  window.removeEventListener('mouseup', endDrag);
+};
+
+const windowStyles = computed(() => {
+  const styles = {};
+  const thresholdX = 400;
+  const thresholdY = 500;
+  
+  if (dragPosition.value.x > window.innerWidth - thresholdX) {
+    styles.right = 'auto';
+    styles.left = '0';
+  } else {
+    styles.right = '0';
+    styles.left = 'auto';
+  }
+
+  if (dragPosition.value.y > window.innerHeight - thresholdY) {
+    styles.bottom = 'auto';
+    styles.top = '75px';
+  } else {
+    styles.bottom = '75px';
+    styles.top = 'auto';
+  }
+
+  return styles;
+});
+
 const toggleChat = () => {
+  if (wasMoved.value) return; 
   isOpen.value = !isOpen.value;
 };
 
@@ -155,9 +240,12 @@ const formatTime = (date) => {
 <style scoped>
 .ai-chatbot-container {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
   z-index: 9999;
+  user-select: none;
+  transition: bottom 0.1s ease, right 0.1s ease;
+}
+.ai-chatbot-container.dragging {
+  transition: none;
 }
 
 .fab-btn {
@@ -171,7 +259,16 @@ const formatTime = (date) => {
   align-items: center;
   justify-content: center;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  cursor: pointer;
+  cursor: grab;
+}
+.fab-btn:active {
+  cursor: grabbing;
+}
+.chat-header {
+  cursor: grab;
+}
+.chat-header:active {
+  cursor: grabbing;
 }
 .fab-btn:hover {
   transform: scale(1.1);
@@ -184,8 +281,6 @@ const formatTime = (date) => {
 
 .chat-window {
   position: absolute;
-  bottom: 75px;
-  right: 0;
   width: 380px;
   height: 480px; 
   background-color: white;
@@ -193,6 +288,7 @@ const formatTime = (date) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
 }
 
 @media (max-width: 576px) {
