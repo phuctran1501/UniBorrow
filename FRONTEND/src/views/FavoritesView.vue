@@ -6,14 +6,37 @@
           <h2 class="fw-bold text-primary mb-1 tracking-tight">Thư viện yêu thích</h2>
         </div>
         
-        <div class="search-container position-relative" style="max-width: 400px; width: 100%;">
-          <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-          <input 
-            v-model="searchQuery" 
-            type="text" 
-            class="form-control rounded-pill ps-5 py-2 border-0 shadow-sm" 
-            placeholder="Tìm tên sách, tác giả..."
-          >
+        <!-- Sort & Search Container -->
+        <div class="d-flex align-items-center gap-2" style="max-width: 600px; width: 100%;">
+          <!-- Sort Dropdown -->
+          <div class="dropdown">
+            <button 
+              class="btn btn-white rounded-pill px-3 border-0 dropdown-toggle fw-bold text-muted small shadow-sm bg-white" 
+              type="button" 
+              data-bs-toggle="dropdown" 
+              aria-expanded="false"
+              style="height: 40px; font-size: 0.75rem;"
+            >
+              <i class="bi bi-sort-down me-1"></i> Sắp xếp
+            </button>
+            <ul class="dropdown-menu shadow-lg border-0 rounded-3 mt-2">
+              <li><a class="dropdown-item small fw-medium" href="#" @click.prevent="sortBy = 'newest'">Mới nhất</a></li>
+              <li><a class="dropdown-item small fw-medium" href="#" @click.prevent="sortBy = 'price_asc'">Giá: Thấp đến Cao</a></li>
+              <li><a class="dropdown-item small fw-medium" href="#" @click.prevent="sortBy = 'price_desc'">Giá: Cao đến Thấp</a></li>
+            </ul>
+          </div>
+
+          <!-- Search Input -->
+          <div class="search-container position-relative flex-grow-1">
+            <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+            <input 
+              v-model="searchQuery" 
+              type="text" 
+              class="form-control rounded-pill ps-5 py-2 border-0 shadow-sm" 
+              placeholder="Tìm tên sách, tác giả..."
+              style="height: 40px;"
+            >
+          </div>
         </div>
       </div>
 
@@ -121,17 +144,32 @@ const notifStore = useNotificationStore();
 const router = useRouter();
 
 const searchQuery = ref('');
+const sortBy = ref('newest');
 const borrowingId = ref(null);
 const quantities = reactive({});
 
 const filteredBooks = computed(() => {
-  if (!searchQuery.value.trim()) return bookStore.favorites;
+  let results = [...bookStore.favorites];
+
+  // Apply Search
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase();
+    results = results.filter(book => 
+      book.TenSach.toLowerCase().includes(query) || 
+      (book.TacGia && book.TacGia.toLowerCase().includes(query))
+    );
+  }
+
+  // Apply Sort
+  if (sortBy.value === 'price_asc') {
+    results.sort((a, b) => (a.DonGia || 0) - (b.DonGia || 0));
+  } else if (sortBy.value === 'price_desc') {
+    results.sort((a, b) => (b.DonGia || 0) - (a.DonGia || 0));
+  } else if (sortBy.value === 'newest') {
+    results.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
   
-  const query = searchQuery.value.toLowerCase();
-  return bookStore.favorites.filter(book => 
-    book.TenSach.toLowerCase().includes(query) || 
-    (book.TacGia && book.TacGia.toLowerCase().includes(query))
-  );
+  return results;
 });
 
 const handleRemoveFavorite = async (bookId) => {

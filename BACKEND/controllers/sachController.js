@@ -40,9 +40,18 @@ const getBooks = async (req, res) => {
         const totalBooks = await Sach.countDocuments(query);
         const totalPages = Math.ceil(totalBooks / limit);
 
+        let sortOption = { createdAt: -1 }; 
+        if (req.query.sortBy === 'price_asc') {
+            sortOption = { DonGia: 1 };
+        } else if (req.query.sortBy === 'price_desc') {
+            sortOption = { DonGia: -1 };
+        } else if (req.query.sortBy === 'newest') {
+            sortOption = { createdAt: -1 };
+        }
+
         const books = await Sach.find(query)
             .populate('MaNXB', 'TenNXB')
-            .sort({ createdAt: -1 }) 
+            .sort(sortOption)
             .skip(skip)
             .limit(limit);
 

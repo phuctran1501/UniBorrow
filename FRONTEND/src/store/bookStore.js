@@ -32,13 +32,14 @@ export const useBookStore = defineStore('book', {
         console.error('Lỗi khi tải sách mới cập nhật:', error);
       }
     },
-    async fetchBooks(keyword = '', available = false, publisherIds = [], genreList = [], page = 1) {
+    async fetchBooks(keyword = '', available = false, publisherIds = [], genreList = [], page = 1, sortBy = 'newest') {
       this.loading = true;
       try {
         const params = { 
           keyword, 
           available,
-          page 
+          page,
+          sortBy
         };
         
         if (publisherIds && publisherIds.length > 0) {
@@ -99,7 +100,6 @@ export const useBookStore = defineStore('book', {
     async toggleFavorite(sachId) {
       try {
         const { data } = await api.post(`/yeuthich/toggle/${sachId}`);
-        // Refresh favorites list if we are on favorites page
         await this.fetchFavorites();
         return { success: true, isFavorite: data.isFavorite, message: data.message };
       } catch (error) {

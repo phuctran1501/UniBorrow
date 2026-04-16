@@ -141,7 +141,7 @@
                       </div>
                       <div class="col-md-4">
                         <label class="form-label fw-bold mb-2 text-dark">Đơn giá (VNĐ)</label>
-                        <input type="number" class="form-control rounded-3 border-2 py-2 shadow-sm" v-model="form.DonGia" required min="0" step="1000" style="font-size: 1rem;">
+                        <input type="number" class="form-control rounded-3 border-2 py-2 shadow-sm" v-model="form.DonGia" required min="1" step="1" style="font-size: 1rem;">
                       </div>
                     </div>
 

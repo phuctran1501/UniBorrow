@@ -80,7 +80,26 @@
           <div class="d-flex align-items-center gap-3">
             <h2 class="fw-bold text-primary mb-0 tracking-tight">Thư viện sách</h2>
             
-            <div class="d-flex align-items-center gap-1 bg-white p-1 rounded-pill shadow-sm border ms-2">
+            <div class="d-flex align-items-center gap-2 bg-white p-1 rounded-pill shadow-sm border ms-2">
+              
+              <!-- Sort Dropdown -->
+              <div class="dropdown me-1">
+                <button 
+                  class="btn btn-sm btn-light rounded-pill px-3 border-0 dropdown-toggle fw-bold text-muted small" 
+                  type="button" 
+                  data-bs-toggle="dropdown" 
+                  aria-expanded="false"
+                  style="font-size: 0.75rem;"
+                >
+                  <i class="bi bi-sort-down me-1"></i> Sắp xếp
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2">
+                  <li><a class="dropdown-item small fw-medium" href="#" @click.prevent="sortBy = 'newest'; handleSearch()">Mới nhất</a></li>
+                  <li><a class="dropdown-item small fw-medium" href="#" @click.prevent="sortBy = 'price_asc'; handleSearch()">Giá: Thấp đến Cao</a></li>
+                  <li><a class="dropdown-item small fw-medium" href="#" @click.prevent="sortBy = 'price_desc'; handleSearch()">Giá: Cao đến Thấp</a></li>
+                </ul>
+              </div>
+
               <button 
                 class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center transition-all" 
                 :class="viewMode === 'grid' ? 'btn-primary shadow-sm' : 'btn-outline-light border-0 text-muted'"
@@ -286,6 +305,7 @@ const searchQuery = ref(route.query.q || '');
 const availableOnly = ref(false);            
 const selectedPublishers = ref([]); 
 const selectedGenres = ref([]);   
+const sortBy = ref('newest');
 const isListening = ref(false);
 let recognition = null;
 
@@ -323,12 +343,12 @@ let searchTimeout = null;
 const handleSearch = () => {
   clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
-    bookStore.fetchBooks(searchQuery.value, availableOnly.value, selectedPublishers.value, selectedGenres.value, 1);
+    bookStore.fetchBooks(searchQuery.value, availableOnly.value, selectedPublishers.value, selectedGenres.value, 1, sortBy.value);
   }, 300);
 };
 
 const goToPage = (page) => {
-  bookStore.fetchBooks(searchQuery.value, availableOnly.value, selectedPublishers.value, selectedGenres.value, page);
+  bookStore.fetchBooks(searchQuery.value, availableOnly.value, selectedPublishers.value, selectedGenres.value, page, sortBy.value);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
@@ -373,7 +393,7 @@ const onBorrow = async (book) => {
 
 onMounted(async () => {
   await bookStore.fetchPublishers();
-  bookStore.fetchBooks(searchQuery.value, availableOnly.value, selectedPublishers.value, selectedGenres.value, 1);
+  bookStore.fetchBooks(searchQuery.value, availableOnly.value, selectedPublishers.value, selectedGenres.value, 1, sortBy.value);
 });
 
 watch(() => route.query.q, (newVal) => {
