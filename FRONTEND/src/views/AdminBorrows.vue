@@ -174,7 +174,8 @@ const statusFilters = [
   { label: 'Chờ duyệt', value: 'ChoDuyet' },
   { label: 'Đang mượn', value: 'DangMuon' },
   { label: 'Quá hạn', value: 'QuaHan' },
-  { label: 'Đã trả', value: 'DaTra' }
+  { label: 'Đã trả', value: 'DaTra' },
+  { label: 'Từ chối', value: 'TuChoi' }
 ];
 
 const currentPage = ref(1);

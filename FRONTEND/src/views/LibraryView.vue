@@ -199,7 +199,7 @@
                         </div>
                       </div>
                       <button class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm" :disabled="book.SoQuyen <= 0" @click.stop="onBorrow(book)">
-                        {{ book.SoQuyen > 0 ? 'Mượn sách' : 'Hết hàng' }}
+                        {{ book.SoQuyen > 0 ? 'Mượn sách' : 'Hết sách' }}
                       </button>
                     </div>
                   </div>
@@ -222,7 +222,7 @@
                     </div>
 
                     <button class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm" :disabled="book.SoQuyen <= 0" @click.stop="onBorrow(book)">
-                      {{ book.SoQuyen > 0 ? 'Mượn ngay' : 'Hết hàng' }}
+                      {{ book.SoQuyen > 0 ? 'Mượn ngay' : 'Hết sách' }}
                     </button>
                   </div>
                 </div>

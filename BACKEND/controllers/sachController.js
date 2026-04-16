@@ -63,7 +63,16 @@ const getBookById = async (req, res) => {
         if (!book) {
             return res.status(404).json({ message: 'Không tìm thấy sách' });
         }
-        res.json(book);
+
+        const luotMuon = await TheoDoiMuonSach.countDocuments({
+            MaSach: req.params.id,
+            TrangThai: { $in: ['DangMuon', 'DaTra', 'QuaHan', 'DaThanhToan'] }
+        });
+
+        const bookData = book.toObject();
+        bookData.LuotMuon = luotMuon;
+
+        res.json(bookData);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -101,7 +110,7 @@ const registerMuonSach = async (req, res) => {
         });
         
         if (dangMuonCount >= 5) {
-            return res.status(400).json({ message: `Bạn đã đạt giới hạn 5 phiếu mượn (đang có ${dangMuonCount} phiếu). Vui lòng trả sách hoặc đợi duyệt để tiếp tục.` });
+            return res.status(400).json({ message: `Bạn chỉ được mượn tối đa 5 cuốn sách. Vui lòng trả sách hoặc đợi duyệt để tiếp tục.` });
         }
 
         const phieuMuon = await TheoDoiMuonSach.create({
@@ -311,9 +320,32 @@ const getRecentBooks = async (req, res) => {
     }
 };
 
+const getRecommendedBooks = async (req, res) => {
+    try {
+        const popularBooks = await TheoDoiMuonSach.aggregate([
+            { $group: { _id: '$MaSach', borrowCount: { $sum: 1 } } },
+            { $sort: { borrowCount: -1 } },
+            { $limit: 6 }
+        ]);
+
+        if (popularBooks.length > 0) {
+            const bookIds = popularBooks.map(item => item._id);
+            const books = await Sach.find({ _id: { $in: bookIds } }).populate('MaNXB', 'TenNXB');
+            
+            const sortedBooks = bookIds.map(id => books.find(b => b._id.toString() === id.toString())).filter(Boolean);
+            return res.json(sortedBooks);
+        }
+
+        const data = await Sach.find().sort({ createdAt: -1 }).limit(6).populate('MaNXB', 'TenNXB');
+        res.json(data);
+    } catch (e) {
+        res.status(500).json({ message: e.message });
+    }
+};
+
 module.exports = {
     getBooks, getBookById, registerMuonSach, cancelMuonSach, 
     createBook, updateBook, deleteBook,
     approveBorrow, rejectBorrow, returnBook, payFine,
-    getMyBorrows, getAllBorrows, getRecentBooks
+    getMyBorrows, getAllBorrows, getRecentBooks, getRecommendedBooks
 };

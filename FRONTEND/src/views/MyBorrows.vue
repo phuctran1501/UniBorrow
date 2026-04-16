@@ -7,9 +7,7 @@
       </div>
     </div>
 
-    <!-- Thanh công cụ: Tìm kiếm và Lọc (Gộp thành 1 hàng) -->
     <div class="row g-3 align-items-center mb-4">
-      <!-- Tìm kiếm theo tên sách -->
       <div class="col-lg-4">
         <div class="search-box position-relative">
           <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
@@ -29,12 +27,10 @@
         </div>
       </div>
       
-      <!-- Bộ lọc trạng thái (Style Segmented Control) -->
       <div class="col-lg-8">
         <div class="d-flex justify-content-lg-end">
           <div class="d-flex bg-white border rounded-pill p-1 shadow-sm overflow-auto no-scrollbar" style="max-width: fit-content;">
             <template v-for="(filter, index) in statusFilters" :key="filter.value">
-              <!-- Đường phân cách -->
               <div v-if="index > 0" class="vr my-2 text-muted opacity-25 flex-shrink-0" style="height: 1.2rem;"></div>
               
               <button 
@@ -152,7 +148,8 @@ const statusFilters = [
   { label: 'Chờ duyệt', value: 'ChoDuyet' },
   { label: 'Đang mượn', value: 'DangMuon' },
   { label: 'Quá hạn', value: 'QuaHan' },
-  { label: 'Đã trả', value: 'DaTra' }
+  { label: 'Đã trả', value: 'DaTra' },
+  { label: 'Từ chối', value: 'TuChoi' }
 ];
 
 const hasOverdue = computed(() => {

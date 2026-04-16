@@ -18,7 +18,7 @@ app.use('/api/docgia', require('./routes/docGiaRoutes'));
 app.use('/api/sach', require('./routes/sachRoutes'));       
 app.use('/api/nhanvien', require('./routes/nhanVienRoutes')); 
 app.use('/api/nhaxuatban', require('./routes/nhaXuatBanRoutes')); 
-
+app.use('/api/ai', require('./routes/aiRoutes')); 
 app.get('/', (req, res) => {
     res.send('UniBorrow API is running...');
 });

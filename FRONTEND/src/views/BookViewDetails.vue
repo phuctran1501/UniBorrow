@@ -49,7 +49,10 @@
         </div>
 
         <div class="col-lg-7">
-          <div class="book-info-content bg-white p-4 p-md-5 rounded-4 shadow-sm h-100">
+          <div class="book-info-content bg-white p-4 p-md-5 rounded-4 shadow-sm h-100 position-relative">
+            <div v-if="book.LuotMuon !== undefined" class="position-absolute" style="top: 1.5rem; right: 2rem;">
+              <span class="text-dark x-small fw-medium opacity-75">Lượt mượn: {{ book.LuotMuon }}</span>
+            </div>
             <div class="mb-4">
               <h1 class="h3 fw-bold text-dark mb-2">{{ book.TenSach }}</h1>
               <p class="h4 text-primary fw-bold mb-0">
