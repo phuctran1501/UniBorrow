@@ -168,8 +168,6 @@ router.get('/recent', getRecentBooks);
  *       200:
  *         description: Xóa thành công
  */
-router.route('/:id').get(getBookById).put(protect, nhanVienOnly, updateBook).delete(protect, nhanVienOnly, deleteBook);
-
 /**
  * @swagger
  * /api/sach/my-borrows:
@@ -197,6 +195,26 @@ router.get('/my-borrows', protect, getMyBorrows);
  *         description: Danh sách mượn sách toàn hệ thống
  */
 router.get('/all-borrows', protect, nhanVienOnly, getAllBorrows);
+
+/**
+ * @swagger
+ * /api/sach/{id}:
+ *   get:
+ *     summary: Lấy thông tin sách theo ID
+ *     tags: [Sách]
+ *   put:
+ *     summary: Cập nhật thông tin sách
+ *     tags: [Sách]
+ *     security:
+ *       - bearerAuth: []
+ *   delete:
+ *     summary: Xóa sách
+ *     tags: [Sách]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.route('/:id').get(getBookById).put(protect, nhanVienOnly, updateBook).delete(protect, nhanVienOnly, deleteBook);
+
 
 /**
  * @swagger

@@ -10,7 +10,7 @@ const sachSchema = new mongoose.Schema(
         TacGia: { type: String },
         TheLoai: { 
             type: String, 
-            enum: ['Công nghệ', 'Kinh tế', 'Giáo dục', 'Tiểu thuyết', 'Văn học', 'Thiếu nhi', 'Chưa xác định'],
+            enum: ['Công nghệ', 'Kinh tế', 'Giáo dục', 'Tiểu thuyết', 'Văn học', 'Tâm lý học', 'Chưa xác định'],
             default: 'Chưa xác định' 
         },
         HinhAnh: { type: String },

@@ -23,7 +23,7 @@
           <div class="list-group list-group-flush">
             <div class="mb-4">
               <h6 class="fw-bold mb-1">Tổng kho sách</h6>
-              <p class="text-muted small mb-0">Thư viện hiện có {{ stats.totalBooks }} đầu sách khác nhau.</p>
+              <p class="text-muted small mb-0">Thư viện hiện có {{ stats.totalBooks}} đầu sách khác nhau.</p>
             </div>
             <div class="mb-4">
               <h6 class="fw-bold mb-1">Đang chờ xử lý</h6>

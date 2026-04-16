@@ -1,6 +1,7 @@
 const Sach = require('../models/Sach');
 const TheoDoiMuonSach = require('../models/TheoDoiMuonSach');
 const DocGia = require('../models/DocGia');
+const NhanVien = require('../models/NhanVien');
 const mongoose = require('mongoose');
 const { sendEmail } = require('../utils/emailService');
 const { checkOverdueBorrows } = require('../utils/cronJobs');
@@ -287,6 +288,7 @@ const getMyBorrows = async (req, res) => {
         
         const data = await TheoDoiMuonSach.find({ MaDocGia: req.user._id })
             .populate('MaSach', 'TenSach TacGia HinhAnh')
+            .populate('MaDocGia', 'Email HoLot Ten HoTenNV')
             .sort({ createdAt: -1 });
         
         const now = new Date();
@@ -313,7 +315,10 @@ const getMyBorrows = async (req, res) => {
 const getAllBorrows = async (req, res) => {
     try {
         await checkOverdueBorrows();
-        const data = await TheoDoiMuonSach.find().populate('MaSach', 'TenSach').populate('MaDocGia', 'Email HoLot Ten');
+        const data = await TheoDoiMuonSach.find()
+            .populate('MaSach', 'TenSach')
+            .populate('MaDocGia', 'Email HoLot Ten HoTenNV');
+        
         res.json(data);
     } catch (e) {
         res.status(500).json({ message: e.message });

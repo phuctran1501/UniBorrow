@@ -80,7 +80,7 @@
             <tr v-for="item in paginatedBorrows" :key="item._id" class="transition-all">
               <td class="px-4 py-3 border-0">
                 <div>
-                  <div class="fw-bold text-dark">{{ item.MaDocGia?.HoLot }} {{ item.MaDocGia?.Ten }}</div>
+                  <div class="fw-bold text-dark">{{ getFullName(item.MaDocGia) }}</div>
                   <div class="small text-muted">{{ item.MaDocGia?.Email }}</div>
                 </div>
               </td>
@@ -191,7 +191,7 @@ const filteredBorrows = computed(() => {
   if (searchQuery.value.trim()) {
     const q = searchQuery.value.toLowerCase();
     result = result.filter(b => {
-      const fullName = `${b.MaDocGia?.HoLot || ''} ${b.MaDocGia?.Ten || ''}`.toLowerCase();
+      const fullName = getFullName(b.MaDocGia).toLowerCase();
       const email = (b.MaDocGia?.Email || '').toLowerCase();
       return fullName.includes(q) || email.includes(q);
     });
@@ -219,6 +219,12 @@ watch([searchQuery, statusFilter], () => {
 const getCount = (status) => {
   if (status === 'All') return adminStore.borrows.length;
   return adminStore.borrows.filter(b => b.TrangThai === status).length;
+};
+
+const getFullName = (user) => {
+  if (!user) return 'N/A';
+  if (user.HoTenNV) return user.HoTenNV;
+  return `${user.HoLot || ''} ${user.Ten || ''}`.trim() || 'Người dùng hệ thống';
 };
 
 const formatDate = (date) => {

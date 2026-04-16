@@ -228,7 +228,7 @@ const genres = [
   'Giáo dục', 
   'Tiểu thuyết', 
   'Văn học', 
-  'Thiếu nhi'
+  'Tâm lý học'
 ];
 
 const form = reactive({

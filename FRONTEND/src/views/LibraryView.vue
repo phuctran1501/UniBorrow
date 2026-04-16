@@ -299,7 +299,7 @@ const setQuantity = (bookId, val) => {
   quantities.value[bookId] = val;
 };
 
-const genres = ['Công nghệ', 'Kinh tế', 'Giáo dục', 'Tiểu thuyết', 'Văn học', 'Thiếu nhi'];
+const genres = ['Công nghệ', 'Kinh tế', 'Giáo dục', 'Tiểu thuyết', 'Văn học', 'Tâm lý học'];
 
 const searchQuery = ref(route.query.q || ''); 
 const availableOnly = ref(false);            
