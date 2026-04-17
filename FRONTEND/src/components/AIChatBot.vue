@@ -83,12 +83,18 @@
 import { ref, onMounted, nextTick, watch, computed } from 'vue';
 import axios from 'axios';
 import { marked } from 'marked';
+import { useVoiceRecognition } from '../composables/useVoiceRecognition';
 
 const isOpen = ref(false);
 const isLoading = ref(false);
 const inputMessage = ref('');
 const messages = ref([]);
 const messageContainer = ref(null);
+
+const { isListening, toggleVoiceSearch } = useVoiceRecognition((transcript) => {
+  inputMessage.value = transcript;
+  sendMessage();
+});
 
 const isDragging = ref(false);
 const dragPosition = ref({ x: 30, y: 30 }); 
@@ -366,5 +372,23 @@ const formatTime = (date) => {
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #cbd5e0;
   border-radius: 10px;
+}
+
+.voice-btn {
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50% !important;
+  aspect-ratio: 1/1;
+}
+
+.voice-btn:hover {
+  background-color: rgba(var(--primary-rgb), 0.05);
+  color: var(--primary-color) !important;
 }
 </style>

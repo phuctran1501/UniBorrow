@@ -113,7 +113,7 @@
                   <div class="col-lg-7 d-flex flex-column">
                     <div class="mb-4">
                       <label class="form-label fw-bold mb-2 text-dark">Tên sách</label>
-                      <input type="text" class="form-control rounded-3 border-2 py-2 shadow-sm" v-model="form.TenSach" required style="font-size: 1.1rem;">
+                      <input type="text" class="form-control rounded-3 border-2 py-2 shadow-sm" v-model="form.TenSach" required stmyle="font-size: 1.1rem;">
                     </div>
                     
                     <div class="row g-3 mb-4">

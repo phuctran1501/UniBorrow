@@ -1,5 +1,5 @@
 <template>
-  <div class="container py-5 min-vh-100 bg-light">
+  <div class="container py-5 min-vh-100">
     <div class="row g-4">
       <aside class="col-lg-3">
         <div class="filter-sidebar p-4 rounded-4 bg-white shadow-sm border sticky-top" style="top: 100px;">
@@ -473,9 +473,20 @@ onMounted(async () => {
 
 .voice-btn {
   transition: all 0.3s ease;
-  width: 40px; height: 40px;
-  display: flex; align-items: center; justify-content: center;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50% !important;
+  aspect-ratio: 1/1;
+}
+
+.voice-btn:hover {
+  background-color: rgba(var(--primary-rgb), 0.05);
+  color: var(--primary-color) !important;
 }
 
 .pulse { animation: pulse-red 1.5s infinite; }
@@ -500,6 +511,11 @@ onMounted(async () => {
 }
 .quantity-selector button:hover:not(:disabled) {
   background-color: #e9ecef !important;
+}
+
+.voice-btn:hover {
+  background-color: rgba(var(--primary-rgb), 0.05);
+  color: var(--primary-color) !important;
 }
 
 .max-w-md { max-width: 400px; }

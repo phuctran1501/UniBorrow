@@ -201,6 +201,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useBookStore } from '../store/bookStore';
+import { useVoiceRecognition } from '../composables/useVoiceRecognition';
 import libraryImg from '../assets/library.png';
 
 const searchQuery = ref('');
@@ -268,42 +269,10 @@ const libraryNews = [
   }
 ];
 
-const isListening = ref(false); 
-let recognition = null;          
-
-const toggleVoiceSearch = () => {
-  if (!recognition) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      recognition = new SpeechRecognition();
-      recognition.lang = 'vi-VN';
-      recognition.continuous = false;
-      recognition.interimResults = false;
-
-      recognition.onstart = () => { isListening.value = true; };
-      recognition.onend = () => { isListening.value = false; };
-      
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        searchQuery.value = transcript;
-        handleSearch(); 
-      };
-
-      recognition.onerror = (event) => {
-        console.error('Lỗi nhận dạng giọng nói:', event.error);
-        isListening.value = false;
-      };
-    }
-  }
-
-  if (recognition) {
-    if (isListening.value) {
-      recognition.stop();
-    } else {
-      recognition.start();
-    }
-  }
-};
+const { isListening, toggleVoiceSearch } = useVoiceRecognition((transcript) => {
+  searchQuery.value = transcript;
+  handleSearch(); 
+});
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {

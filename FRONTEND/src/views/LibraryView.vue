@@ -131,7 +131,7 @@
               @input="handleSearch"
             >
             <button 
-              class="btn btn-link text-muted p-0 me-3 border-0 shadow-none voice-btn"
+              class="btn btn-link text-muted p-0 me-2 border-0 shadow-none voice-btn"
               @click="toggleVoiceSearch"
               :class="{ 'text-danger pulse': isListening }"
               type="button"
@@ -283,6 +283,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useBookStore } from '../store/bookStore';
 import { useAuthStore } from '../store/authStore';
 import { useNotificationStore } from '../store/notificationStore';
+import { useVoiceRecognition } from '../composables/useVoiceRecognition';
 
 
 const route = useRoute();
@@ -306,38 +307,14 @@ const availableOnly = ref(false);
 const selectedPublishers = ref([]); 
 const selectedGenres = ref([]);   
 const sortBy = ref('newest');
-const isListening = ref(false);
-let recognition = null;
+const { isListening, toggleVoiceSearch } = useVoiceRecognition((transcript) => {
+  searchQuery.value = transcript;
+  handleSearch(); 
+});
 
 const hasFilters = computed(() => {
   return searchQuery.value !== '' || availableOnly.value === true || selectedPublishers.value.length > 0 || selectedGenres.value.length > 0;
 });
-
-const toggleVoiceSearch = () => {
-  if (!recognition) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      recognition = new SpeechRecognition();
-      recognition.lang = 'vi-VN';
-      recognition.continuous = false;
-      recognition.interimResults = false;
-
-      recognition.onstart = () => { isListening.value = true; };
-      recognition.onend = () => { isListening.value = false; };
-      
-      recognition.onresult = (event) => {
-        searchQuery.value = event.results[0][0].transcript;
-        handleSearch(); 
-      };
-
-      recognition.onerror = () => { isListening.value = false; };
-    }
-  }
-
-  if (recognition) {
-    isListening.value ? recognition.stop() : recognition.start();
-  }
-};
 
 let searchTimeout = null;
 const handleSearch = () => {
@@ -483,9 +460,15 @@ watch(() => route.query.q, (newVal) => {
 
 .voice-btn {
   transition: all 0.3s ease;
-  width: 40px; height: 40px;
-  display: flex; align-items: center; justify-content: center;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50% !important;
+  aspect-ratio: 1/1;
 }
 .voice-btn:hover {
   background-color: rgba(var(--primary-rgb), 0.05);
