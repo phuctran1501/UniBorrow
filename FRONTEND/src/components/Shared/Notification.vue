@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 2000">
+    <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 9999">
       <transition-group name="toast">
         <div 
           v-for="msg in notifStore.messages" 

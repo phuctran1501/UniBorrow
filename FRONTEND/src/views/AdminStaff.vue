@@ -53,13 +53,13 @@
     </div>
 
     <Teleport to="body">
-      <div v-if="showModal" class="modal-backdrop fade show" style="z-index: 1060;"></div>
+      <div v-if="showModal" class="modal-backdrop modal-backdrop-subtle fade show" style="z-index: 1060;"></div>
       <div v-if="showModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1070;">
         <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 p-4 pb-0">
-              <h5 class="modal-title fw-bold text-primary">Thêm nhân sự mới</h5>
-              <button type="button" class="btn-close shadow-none" @click="showModal = false"></button>
+          <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="auth-header py-3 d-flex align-items-center justify-content-between px-4">
+              <h5 class="modal-title fw-bold mb-0 text-white">Thêm nhân sự mới</h5>
+              <button type="button" class="btn-close btn-close-white shadow-none" @click="showModal = false"></button>
             </div>
             <div class="modal-body p-4">
               <form @submit.prevent="handleSubmit">
@@ -171,6 +171,4 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.modal-backdrop { opacity: 0.5; }
-
 </style>

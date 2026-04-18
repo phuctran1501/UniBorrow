@@ -2,9 +2,9 @@
   <div class="container py-4 mt-2">
     <div class="row justify-content-center">
       <div class="col-md-5">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-          <div class="bg-primary p-4 text-center">
-            <h3 class="text-white fw-bold mb-0">{{ loginType === 'docgia' ? 'Đăng nhập' : 'Đăng nhập Admin' }}</h3>
+        <div class="auth-card">
+          <div class="auth-header">
+            <h3 class="fw-bold mb-0">{{ loginType === 'docgia' ? 'Đăng nhập' : 'Đăng nhập Admin' }}</h3>
           </div>
           <div class="card-body p-5">
             <form @submit.prevent="handleLogin">
@@ -54,13 +54,13 @@
                   
                   <div class="row g-2">
                     <div class="col-6">
-                      <button @click="loginWithSocial('google')" class="social-btn btn btn-outline-light border text-dark w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 hover-shadow shadow-sm">
+                      <button @click="loginWithSocial('google')" class="social-btn btn border w-100 rounded-3 hover-lift shadow-sm">
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18" alt="Google">
                         <span class="small fw-bold">Google</span>
                       </button>
                     </div>
                     <div class="col-6">
-                      <button @click="loginWithSocial('github')" class="social-btn btn btn-outline-light border text-dark w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 hover-shadow shadow-sm">
+                      <button @click="loginWithSocial('github')" class="social-btn btn border w-100 rounded-3 hover-lift shadow-sm">
                         <i class="bi bi-github fs-5"></i>
                         <span class="small fw-bold">GitHub</span>
                       </button>
@@ -162,25 +162,5 @@ const loginWithSocial = async (type) => {
 </script>
 
 <style scoped>
-
-.form-control:focus {
-  border-color: var(--secondary-color);
-  box-shadow: 0 0 0 0.25rem rgba(var(--secondary-rgb), 0.1);
-}
-
-.hover-shadow:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05) !important;
-  border-color: var(--primary-color) !important;
-  background-color: #f8fafc;
-}
-
-.social-btn {
-  height: 38px;
-  transition: all 0.2s ease;
-}
-
-.hover-shadow {
-  transition: all 0.2s ease;
-}
 </style>
+

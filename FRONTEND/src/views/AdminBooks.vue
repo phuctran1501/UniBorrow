@@ -9,22 +9,7 @@
     
     <div class="row mb-4">
       <div class="col-md-6 col-lg-4">
-        <div class="search-box position-relative">
-          <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-          <input 
-            type="text" 
-            class="form-control rounded-pill ps-5 py-2 border shadow-sm" 
-            placeholder="Tìm kiếm tên sách, tác giả..."
-            v-model="searchQuery"
-          >
-          <button 
-            v-if="searchQuery" 
-            class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 text-muted p-0 border-0 shadow-none"
-            @click="searchQuery = ''"
-          >
-            <i class="bi bi-x-circle-fill"></i>
-          </button>
-        </div>
+        <SearchBox v-model="searchQuery" placeholder="Tìm kiếm tên sách, tác giả..." />
       </div>
     </div>
 
@@ -78,34 +63,20 @@
       </div>
     </div>
 
-    <div v-if="bookStore.totalPages > 1" class="d-flex justify-content-center align-items-center mb-5 gap-3">
-      <button 
-        class="btn btn-outline-dark rounded-pill px-4 fw-bold shadow-sm"
-        :disabled="bookStore.currentPage === 1"
-        @click="goToPage(bookStore.currentPage - 1)"
-      >
-        <i class="bi bi-chevron-left"></i>
-      </button>
-      
-      <span class="fw-bold">Trang {{ bookStore.currentPage }} / {{ bookStore.totalPages }}</span>
-      
-      <button 
-        class="btn btn-outline-dark rounded-pill px-4 fw-bold shadow-sm"
-        :disabled="bookStore.currentPage === bookStore.totalPages"
-        @click="goToPage(bookStore.currentPage + 1)"
-      >
-        <i class="bi bi-chevron-right"></i>
-      </button>
-    </div>
+    <Pagination 
+      :current-page="bookStore.currentPage"
+      :total-pages="bookStore.totalPages"
+      @change="goToPage"
+    />
 
     <Teleport to="body">
-      <div v-if="showModal" class="modal-backdrop fade show" style="z-index: 1060;"></div>
+      <div v-if="showModal" class="modal-backdrop modal-backdrop-subtle fade show" style="z-index: 1060;"></div>
       <div v-if="showModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1070;">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 950px;">
-          <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 p-3 pb-0">
-              <h6 class="modal-title fw-bold text-primary">{{ isEditing ? 'Cập nhật sách' : 'Thêm sách mới' }}</h6>
-              <button type="button" class="btn-close shadow-none small" @click="showModal = false" style="font-size: 0.75rem;"></button>
+          <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="auth-header py-3 d-flex align-items-center justify-content-between px-4">
+              <h5 class="modal-title fw-bold mb-0 text-white">{{ isEditing ? 'Cập nhật sách' : 'Thêm sách mới' }}</h5>
+              <button type="button" class="btn-close btn-close-white shadow-none" @click="showModal = false"></button>
             </div>
             <div class="modal-body p-3">
               <form @submit.prevent="handleSubmit">
@@ -203,6 +174,8 @@ import { useBookStore } from '../store/bookStore';
 import { useAdminStore } from '../store/adminStore';
 import { useNotificationStore } from '../store/notificationStore';
 import Notification from '../components/Shared/Notification.vue';
+import SearchBox from '../components/Shared/SearchBox.vue';
+import Pagination from '../components/Shared/Pagination.vue';
 
 const bookStore = useBookStore();
 const adminStore = useAdminStore();
@@ -327,21 +300,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.modal-backdrop { opacity: 0.5; }
-.bg-success-subtle { background-color: rgba(40, 167, 69, 0.1); }
-.bg-danger-subtle { background-color: rgba(220, 53, 69, 0.1); }
-.text-info { color: #0dcaf0 !important; }
-
-.upload-area {
-  border: 2px dashed #e2e8f0;
-  transition: all 0.3s ease;
-}
-
-.upload-area:hover {
-  border-color: var(--primary-color);
-  background-color: rgba(31, 92, 169, 0.02);
-}
-
-.border-dashed { border-style: dashed !important; }
-.cursor-pointer { cursor: pointer; }
 </style>
+

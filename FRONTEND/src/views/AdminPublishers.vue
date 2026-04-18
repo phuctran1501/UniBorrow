@@ -9,22 +9,7 @@
 
     <div class="row mb-4">
       <div class="col-md-6 col-lg-4">
-        <div class="search-box position-relative">
-          <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-          <input 
-            type="text" 
-            class="form-control rounded-pill ps-5 py-2 border shadow-sm" 
-            placeholder="Tìm kiếm nhà xuất bản..."
-            v-model="searchQuery"
-          >
-          <button 
-            v-if="searchQuery" 
-            class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 text-muted p-0 border-0 shadow-none"
-            @click="searchQuery = ''"
-          >
-            <i class="bi bi-x-circle-fill"></i>
-          </button>
-        </div>
+        <SearchBox v-model="searchQuery" placeholder="Tìm kiếm nhà xuất bản..." />
       </div>
     </div>
 
@@ -65,13 +50,13 @@
     </div>
 
     <Teleport to="body">
-      <div v-if="showModal" class="modal-backdrop fade show" style="z-index: 1060;"></div>
+      <div v-if="showModal" class="modal-backdrop modal-backdrop-subtle fade show" style="z-index: 1060;"></div>
       <div v-if="showModal" class="modal fade show d-block" tabindex="-1" style="z-index: 1070;">
         <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header border-0 p-4 pb-0">
-              <h5 class="modal-title fw-bold text-primary">{{ isEditing ? 'Cập nhật nhà xuất bản' : 'Thêm nhà xuất bản mới' }}</h5>
-              <button type="button" class="btn-close shadow-none" @click="showModal = false"></button>
+          <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="auth-header py-3 d-flex align-items-center justify-content-between px-4">
+              <h5 class="modal-title fw-bold mb-0 text-white">{{ isEditing ? 'Cập nhật nhà xuất bản' : 'Thêm nhà xuất bản mới' }}</h5>
+              <button type="button" class="btn-close btn-close-white shadow-none" @click="showModal = false"></button>
             </div>
             <div class="modal-body p-4">
               <form @submit.prevent="handleSubmit">
@@ -103,6 +88,7 @@ import { ref, reactive, onMounted, computed } from 'vue';
 import { useAdminStore } from '../store/adminStore';
 import { useNotificationStore } from '../store/notificationStore';
 import Notification from '../components/Shared/Notification.vue';
+import SearchBox from '../components/Shared/SearchBox.vue';
 
 const adminStore = useAdminStore();
 const notifStore = useNotificationStore();
@@ -184,6 +170,4 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.modal-backdrop { opacity: 0.5; }
-.text-info { color: #0dcaf0 !important; }
 </style>

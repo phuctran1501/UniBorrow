@@ -8,49 +8,16 @@
 
     <div class="row g-3 align-items-center mb-4">
       <div class="col-lg-4">
-        <div class="search-box position-relative">
-          <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-          <input 
-            type="text" 
-            class="form-control rounded-pill ps-5 py-2 border shadow-sm" 
-            placeholder="Tìm tên sách..."
-            v-model="searchQuery"
-          >
-          <button 
-            v-if="searchQuery" 
-            class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 text-muted p-0 border-0 shadow-none"
-            @click="searchQuery = ''"
-          >
-            <i class="bi bi-x-circle-fill"></i>
-          </button>
-        </div>
+        <SearchBox v-model="searchQuery" placeholder="Tìm tên sách..." />
       </div>
       
       <div class="col-lg-8">
         <div class="d-flex justify-content-lg-end">
-          <div class="d-flex bg-white border rounded-pill p-1 shadow-sm overflow-auto no-scrollbar" style="max-width: fit-content;">
-            <template v-for="(filter, index) in statusFilters" :key="filter.value">
-              <div v-if="index > 0" class="vr my-2 text-muted opacity-25 flex-shrink-0" style="height: 1.2rem;"></div>
-              
-              <button 
-                @click="statusFilter = filter.value"
-                :class="[
-                  'btn border-0 fw-bold px-3 py-1 transition-all d-flex align-items-center rounded-pill text-nowrap',
-                  statusFilter === filter.value ? 'btn-primary shadow-sm text-white' : 'btn-link text-dark text-decoration-none'
-                ]"
-                style="font-size: 0.85rem;"
-              >
-                {{ filter.label }}
-                <span 
-                  v-if="getCount(filter.value) > 0" 
-                  :class="['badge rounded-circle ms-2 d-flex align-items-center justify-content-center', statusFilter === filter.value ? 'bg-white text-primary' : 'bg-light text-muted border']"
-                  style="min-width: 18px; height: 18px; font-size: 0.65rem;"
-                >
-                  {{ getCount(filter.value) }}
-                </span>
-              </button>
-            </template>
-          </div>
+          <StatusFilterBar 
+            v-model="statusFilter"
+            :filters="statusFilters"
+            :get-count="getCount"
+          />
         </div>
       </div>
     </div>
@@ -133,6 +100,8 @@ import { ref, computed, onMounted } from 'vue';
 import api from '../services/api';
 import { useNotificationStore } from '../store/notificationStore';
 import Notification from '../components/Shared/Notification.vue';
+import StatusFilterBar from '../components/Shared/StatusFilterBar.vue';
+import SearchBox from '../components/Shared/SearchBox.vue';
 
 const notifStore = useNotificationStore();
 
@@ -243,13 +212,7 @@ onMounted(fetchBorrows);
 .bg-info-subtle { background-color: rgba(13, 202, 240, 0.1); }
 .bg-secondary-subtle { background-color: rgba(108, 117, 125, 0.1); }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+
 .transition-all {
   transition: all 0.3s ease;
 }

@@ -105,10 +105,5 @@ onMounted(() => {
   background-color: #fff !important;
   border-color: #dee2e6 !important;
 }
-
-.search-input:focus {
-  border-color: var(--secondary-color) !important;
-}
-
-.transition-all { transition: all 0.2s ease; }
 </style>
+

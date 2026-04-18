@@ -7,11 +7,12 @@ const options = {
         info: {
             title: 'UniBorrow API',
             version: '1.0.0',
-            description: 'API documentation cho hệ thống quản lý mượn sách UniBorrow',
+            description:
+                'API documentation cho hệ thống quản lý mượn sách UniBorrow',
         },
         servers: [
             {
-                url: 'http://localhost:5000',
+                url: 'http://localhost:3000',
                 description: 'Local server',
             },
         ],
@@ -37,7 +38,9 @@ const swaggerSpec = swaggerJSDoc(options);
 
 const swaggerDocs = (app, port) => {
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-    console.log(`Tài liệu API (Swagger) có tại: http://localhost:${port}/api-docs`);
+    console.log(
+        `Tài liệu API (Swagger) có tại: http://localhost:${port}/api-docs`
+    );
 };
 
 module.exports = swaggerDocs;

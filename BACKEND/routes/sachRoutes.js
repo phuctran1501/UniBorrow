@@ -6,6 +6,7 @@ const {
     deleteBook, approveBorrow, rejectBorrow, returnBook, 
     payFine, getAllBorrows 
 } = require('../controllers/sachController');
+const { checkOverdueBorrows } = require('../utils/cronJobs');
 const { protect, nhanVienOnly } = require('../middlewares/authMiddleware');
 
 /**
@@ -335,5 +336,19 @@ router.put('/return/:idBorrow', protect, nhanVienOnly, returnBook);
  *         description: Thanh toán thành công
  */
 router.put('/pay-fine/:idBorrow', protect, nhanVienOnly, payFine);
+
+/**
+ * @swagger
+ * /api/sach/check-overdue:
+ *   post:
+ *     summary: Kích hoạt kiểm tra sách quá hạn thủ công (Chỉ Nhân viên)
+ *     tags: [Sách]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Kiểm tra hoàn tất
+ */
+router.post('/check-overdue', protect, nhanVienOnly, checkOverdueBorrows);
 
 module.exports = router;

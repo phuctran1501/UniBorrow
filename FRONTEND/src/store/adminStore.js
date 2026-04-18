@@ -47,6 +47,14 @@ export const useAdminStore = defineStore('admin', {
         return { success: false, message: error.response?.data?.message || 'Lỗi khi xử lý trả sách' };
       }
     },
+    async checkOverdue() {
+      try {
+        const { data } = await api.post('/sach/check-overdue');
+        return { success: true, ...data };
+      } catch (error) {
+        return { success: false, message: error.response?.data?.message || 'Lỗi khi quét phiếu quá hạn' };
+      }
+    },
     async fetchAllUsers() {
       this.loading = true;
       try {

@@ -2,8 +2,8 @@
   <div class="container py-4 mt-2">
     <div class="row justify-content-center">
       <div class="col-md-7 col-lg-6">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-          <div class="bg-primary p-4 text-center">
+        <div class="auth-card">
+          <div class="auth-header">
             <h3 class="text-white fw-bold mb-0">Đăng ký</h3>
           </div>
           <div class="card-body p-5">

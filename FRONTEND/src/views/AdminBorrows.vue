@@ -2,56 +2,29 @@
   <div class="fade-in">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h3 class="fw-bold text-primary mb-0">Quản lý mượn trả</h3>
-      <!-- <button class="btn btn-outline-primary rounded-pill px-4" @click="adminStore.fetchAllBorrows()" :disabled="adminStore.loading">
-        <i class="bi bi-arrow-clockwise me-1"></i> Làm mới
-      </button> -->
+      <button 
+        class="btn btn-primary rounded-pill px-4 shadow-sm" 
+        @click="handleScanOverdue" 
+        :disabled="adminStore.loading || isScanning"
+      >
+        <i v-if="!isScanning"></i>
+        <span v-else class="spinner-border spinner-border-sm me-1" role="status"></span>
+        {{ isScanning ? 'Đang quét...' : 'Quét phiếu quá hạn' }}
+      </button>
     </div>
     
     <div class="row g-3 align-items-center mb-4 pb-2">
       <div class="col-lg-4">
-        <div class="search-box position-relative">
-          <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-          <input 
-            type="text" 
-            class="form-control rounded-pill ps-5 py-2 border shadow-sm" 
-            placeholder="Tìm tên độc giả hoặc email..."
-            v-model="searchQuery"
-          >
-          <button 
-            v-if="searchQuery" 
-            class="btn btn-link position-absolute top-50 end-0 translate-middle-y me-2 text-muted p-0 border-0 shadow-none"
-            @click="searchQuery = ''"
-          >
-            <i class="bi bi-x-circle-fill"></i>
-          </button>
-        </div>
+        <SearchBox v-model="searchQuery" placeholder="Tìm tên độc giả hoặc email..." />
       </div>
       
       <div class="col-lg-8">
         <div class="d-flex justify-content-lg-end">
-          <div class="d-inline-flex align-items-center bg-white border rounded-pill p-1 shadow-sm">
-            <template v-for="(filter, index) in statusFilters" :key="filter.value">
-              <div v-if="index > 0" class="vr my-2 text-muted opacity-25" style="height: 1.2rem;"></div>
-              
-              <button 
-                @click="statusFilter = filter.value"
-                :class="[
-                  'btn border-0 fw-bold px-3 py-1 transition-all d-flex align-items-center rounded-pill',
-                  statusFilter === filter.value ? 'btn-primary shadow-sm text-white' : 'btn-link text-dark text-decoration-none'
-                ]"
-                style="font-size: 0.85rem;"
-              >
-                {{ filter.label }}
-                <span 
-                  v-if="getCount(filter.value) > 0" 
-                  :class="['badge rounded-circle ms-2 d-flex align-items-center justify-content-center', statusFilter === filter.value ? 'bg-white text-primary' : 'bg-light text-muted border']"
-                  style="width: 18px; height: 18px; font-size: 0.65rem;"
-                >
-                  {{ getCount(filter.value) }}
-                </span>
-              </button>
-            </template>
-          </div>
+          <StatusFilterBar 
+            v-model="statusFilter"
+            :filters="statusFilters"
+            :get-count="getCount"
+          />
         </div>
       </div>
     </div>
@@ -133,25 +106,11 @@
       </div>
     </div>
 
-    <div v-if="totalPages > 1" class="d-flex justify-content-center align-items-center mt-4 mb-5 gap-3">
-      <button 
-        class="btn btn-outline-dark rounded-pill px-4 fw-bold shadow-sm"
-        :disabled="currentPage === 1"
-        @click="goToPage(currentPage - 1)"
-      >
-        <i class="bi bi-chevron-left"></i>
-      </button>
-      
-      <span class="fw-bold">Trang {{ currentPage }} / {{ totalPages }}</span>
-      
-      <button 
-        class="btn btn-outline-dark rounded-pill px-4 fw-bold shadow-sm"
-        :disabled="currentPage === totalPages"
-        @click="goToPage(currentPage + 1)"
-      >
-        <i class="bi bi-chevron-right"></i>
-      </button>
-    </div>
+    <Pagination 
+      :current-page="currentPage"
+      :total-pages="totalPages"
+      @change="goToPage"
+    />
 
     <Notification :messages="notifStore.messages" @close="notifStore.remove" />
   </div>
@@ -162,12 +121,16 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useAdminStore } from '../store/adminStore';
 import { useNotificationStore } from '../store/notificationStore';
 import Notification from '../components/Shared/Notification.vue';
+import StatusFilterBar from '../components/Shared/StatusFilterBar.vue';
+import SearchBox from '../components/Shared/SearchBox.vue';
+import Pagination from '../components/Shared/Pagination.vue';
 
 const adminStore = useAdminStore();
 const notifStore = useNotificationStore();
 
 const searchQuery = ref('');
 const statusFilter = ref('All');
+const isScanning = ref(false);
 
 const statusFilters = [
   { label: 'Tất cả', value: 'All' },
@@ -299,13 +262,24 @@ const handleReturn = async (id) => {
   }
 };
 
+const handleScanOverdue = async () => {
+  isScanning.value = true;
+  const result = await adminStore.checkOverdue();
+  isScanning.value = false;
+  
+  if (result.success) {
+    notifStore.add(result.message || 'Đã hoàn tất quét phiếu quá hạn');
+    adminStore.fetchAllBorrows(); 
+  } else {
+    notifStore.add(result.message, 'error');
+  }
+};
+
 onMounted(() => {
   adminStore.fetchAllBorrows();
 });
 </script>
 
 <style scoped>
-.bg-info { background-color: var(--secondary-color) !important; }
-.bg-success { background-color: #28a745 !important; }
-.bg-danger { background-color: #dc3545 !important; }
 </style>
+

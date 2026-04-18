@@ -212,7 +212,7 @@ const approveBorrow = async (req, res) => {
         if (user && user.Email) {
             await sendEmail({
                 to: user.Email,
-                subject: '✅ YÊU CẦU MƯỢN SÁCH ĐÃ ĐƯỢC DUYỆT - UniBorrow',
+                subject: 'YÊU CẦU MƯỢN SÁCH ĐÃ ĐƯỢC DUYỆT - UniBorrow',
                 html: `
                     <div style="font-family: Arial, sans-serif;">
                         <h2>Yêu cầu mượn sách được duyệt</h2>
@@ -314,7 +314,6 @@ const getMyBorrows = async (req, res) => {
 
 const getAllBorrows = async (req, res) => {
     try {
-        await checkOverdueBorrows();
         const data = await TheoDoiMuonSach.find()
             .populate('MaSach', 'TenSach')
             .populate('MaDocGia', 'Email HoLot Ten HoTenNV');

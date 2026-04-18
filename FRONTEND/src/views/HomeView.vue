@@ -389,33 +389,6 @@ onMounted(async () => {
   border-color: var(--primary-color) !important;
 }
 
-.voice-btn {
-  transition: all 0.3s ease;
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  min-height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50% !important;
-  aspect-ratio: 1/1;
-}
-
-.voice-btn:hover {
-  background-color: rgba(var(--primary-rgb), 0.05);
-  color: var(--primary-color) !important;
-}
-
-.pulse {
-  animation: pulse-red 1.5s infinite;
-}
-
-@keyframes pulse-red {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
-  70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
-}
 
 .stats-row {
   padding: 0.25rem 0;

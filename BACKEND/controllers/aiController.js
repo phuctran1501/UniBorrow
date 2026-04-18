@@ -12,24 +12,19 @@ const chatWithAI = async (req, res) => {
         console.log("--- Bắt đầu yêu cầu Groq AI ---");
         console.log("Tin nhắn từ người dùng:", message);
 
-        // Kiểm tra Groq API Key
+        // kiểm tra Groq API Key
         const apiKey = process.env.GROQ_API_KEY?.trim();
-        if (!apiKey || apiKey === "your_groq_key_here") {
-            return res.status(500).json({ 
-                message: "Hệ thống AI chưa được cấu hình GROQ_API_KEY. Vui lòng liên hệ Admin." 
-            });
-        }
 
-        // Lấy danh sách sách từ database để làm ngữ cảnh
-        const allBooks = await Sach.find({}, "TenSach TacGia TheLoai MoTa");
+        // lấy danh sách sách từ database để làm ngữ cảnh
+        const allBooks = await Sach.find({}, "TenSach TacGia TheLoai DonGia SoQuyen NamXuatBan MoTa");
         const bookContext = allBooks.map((b, i) => 
-            `${i + 1}. ${b.TenSach} - Tác giả: ${b.TacGia} - Thể loại: ${b.TheLoai}`
+            `${i + 1}. ${b.TenSach} - Tác giả: ${b.TacGia} - Thể loại: ${b.TheLoai} - Số quyển còn lại: ${b.SoQuyen} - Đơn giá: ${b.DonGia} - Năm xuất bản: ${b.NamXuatBan} - Mô tả: ${b.MoTa}`
         ).join("\n");
 
-        // Khởi tạo Groq SDK
+        // khởi tạo Groq SDK
         const groq = new Groq({ apiKey });
 
-        // Chuyển đổi lịch sử chat sang định dạng OpenAI/Groq
+        // chuyển đổi lịch sử chat sang định dạng OpenAI/Groq
         const messages = [
             {
                 role: "system",
@@ -52,7 +47,7 @@ const chatWithAI = async (req, res) => {
             { role: "user", content: message }
         ];
 
-        // Gửi yêu cầu tới Groq Cloud
+        // gửi yêu cầu tới Groq Cloud
         console.log("Đang gửi yêu cầu tới Groq (Model: Llama 3.3 70B)...");
         const chatCompletion = await groq.chat.completions.create({
             messages: messages,
@@ -64,8 +59,6 @@ const chatWithAI = async (req, res) => {
         });
 
         const reply = chatCompletion.choices[0]?.message?.content || "";
-        console.log("AI trả lời thành công!");
-
         res.json({ reply });
 
     } catch (error) {

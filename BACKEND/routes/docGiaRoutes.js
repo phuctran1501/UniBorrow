@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { registerDocGia, loginDocGia, getMe, socialLoginDocGia } = require('../controllers/docGiaController');
-const { checkOverdueBorrows } = require('../utils/cronJobs');
 const { protect } = require('../middlewares/authMiddleware');
 
 /**
@@ -198,14 +197,5 @@ router.get('/', protect, admin, getDocGias);
  *         description: Chuyển đổi trạng thái tài khoản thành công
  */
 router.put('/toggle-status/:id', protect, admin, toggleStatusDocGia);
-
-router.post('/test-overdue-check', protect, admin, async (req, res) => {
-    try {
-        await checkOverdueBorrows();
-        res.json({ message: 'Đã hoàn thành quét quá hạn.' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
 
 module.exports = router;
